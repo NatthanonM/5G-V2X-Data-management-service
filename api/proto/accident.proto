@@ -3,7 +3,7 @@ package proto;
 option go_package = ".;proto";
 
 import "google/protobuf/timestamp.proto";
-// import "google/protobuf/empty.proto";
+import "google/protobuf/empty.proto";
 
 message AccidentData {
   string username = 1;
@@ -15,6 +15,10 @@ message AccidentData {
 
 message CreateAccidentDataResponse { string accident_id = 1; }
 
+message GetAllAccidentDataResponse { repeated AccidentData accidents = 1; }
+
 service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
+  rpc GetAllAccidentData(google.protobuf.Empty)
+      returns (GetAllAccidentDataResponse) {}
 }

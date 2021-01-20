@@ -7,12 +7,14 @@ import (
 )
 
 type AccidentService struct {
-	crud *repositories.CRUDRepository
+	crud            *repositories.CRUDRepository
+	AccidentService *repositories.AccidentRepository
 }
 
-func NewAccidentService(crud *repositories.CRUDRepository) *AccidentService {
+func NewAccidentService(crud *repositories.CRUDRepository, accidentRepository *repositories.AccidentRepository) *AccidentService {
 	return &AccidentService{
-		crud: crud,
+		crud:            crud,
+		AccidentService: accidentRepository,
 	}
 }
 
@@ -30,4 +32,14 @@ func (as *AccidentService) StoreData(username string, carID string, lat float64,
 		return "", err
 	}
 	return id, nil
+}
+
+func (as *AccidentService) GetAllRecords() ([]*models.Accident, error) {
+
+	result, err := as.AccidentService.FindAll()
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

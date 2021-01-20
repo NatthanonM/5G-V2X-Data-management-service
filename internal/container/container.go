@@ -66,6 +66,10 @@ func (cn *Container) Configure() {
 		cn.Error = err
 	}
 
+	if err := cn.container.Provide(repositories.NewAccidentRepository); err != nil {
+		cn.Error = err
+	}
+
 }
 
 func (cn *Container) Run() *Container {

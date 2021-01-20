@@ -13,3 +13,12 @@ func WrapperTimeStamp(t *timestamppb.Timestamp) *time.Time {
 	}
 	return nil
 }
+
+// WrapperTime ...
+func WrapperTime(t *time.Time) *timestamppb.Timestamp {
+	if t != nil {
+		tmp := timestamppb.New(*t)
+		return tmp
+	}
+	return nil
+}
