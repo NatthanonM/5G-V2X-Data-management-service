@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
 )
@@ -32,6 +34,6 @@ func (crud *CRUDRepository) Create(collectionName string, m interface{}) (string
 	if err != nil {
 		return "", err
 	}
-	id := fmt.Sprintf("%s", result.InsertedID)
+	id := fmt.Sprintf("%s", result.InsertedID.(primitive.ObjectID).Hex())
 	return id, nil
 }

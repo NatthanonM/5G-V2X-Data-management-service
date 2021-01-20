@@ -48,8 +48,16 @@ func (cn *Container) Configure() {
 		cn.Error = err
 	}
 
+	if err := cn.container.Provide(controller.NewDrowsinessController); err != nil {
+		cn.Error = err
+	}
+
 	// services
 	if err := cn.container.Provide(services.NewAccidentService); err != nil {
+		cn.Error = err
+	}
+
+	if err := cn.container.Provide(services.NewDrowsinessService); err != nil {
 		cn.Error = err
 	}
 

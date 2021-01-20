@@ -16,18 +16,18 @@ func NewAccidentService(crud *repositories.CRUDRepository) *AccidentService {
 	}
 }
 
-func (as *AccidentService) StoreData(username string) error {
+func (as *AccidentService) StoreData(username string, carID string, lat float64, lng float64, time time.Time) (string, error) {
 	var accident models.Accident
 	accident.Username = username
-	accident.CarID = ""
-	accident.Latitude = 0
-	accident.Longitude = 0
-	accident.Time = time.Unix(0, 0)
+	accident.CarID = carID
+	accident.Latitude = lat
+	accident.Longitude = lng
+	accident.Time = time
 
-	_, err := as.crud.Create("accident", &accident)
+	id, err := as.crud.Create("accident", &accident)
 
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
-	return nil
+	return id, nil
 }

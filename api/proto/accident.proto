@@ -1,7 +1,20 @@
 syntax = "proto3";
-package v1;
-option go_package = ".;v1";
+package proto;
+option go_package = ".;proto";
 
+import "google/protobuf/timestamp.proto";
 // import "google/protobuf/empty.proto";
 
-service AccidentService {}
+message AccidentData {
+  string username = 1;
+  string car_id = 2;
+  google.protobuf.Timestamp time = 3;
+  double latitude = 4;
+  double longitude = 5;
+}
+
+message CreateAccidentDataResponse { string accident_id = 1; }
+
+service AccidentService {
+  rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
+}
