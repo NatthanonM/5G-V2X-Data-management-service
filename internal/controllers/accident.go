@@ -5,6 +5,7 @@ import (
 	"5g-v2x-data-management-service/internal/utils"
 	proto "5g-v2x-data-management-service/pkg/api"
 	"context"
+	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
@@ -30,6 +31,7 @@ func (ac *AccidentController) CreateAccidentData(ctx context.Context, req *proto
 		*utils.WrapperTimeStamp(req.Time),
 	)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &proto.CreateAccidentDataResponse{
@@ -53,6 +55,7 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 		accidentList = append(accidentList, &anAccident)
 	}
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &proto.GetAllAccidentDataResponse{
@@ -63,7 +66,9 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 // GetHourlyAccidentOfCurrentDay ...
 func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context, req *proto.GetHourlyAccidentOfCurrentDayRequest) (*proto.GetHourlyAccidentOfCurrentDayResponse, error) {
 	if req.Hour < 0 || req.Hour > 23 {
-		return nil, status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
+		err := status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
+		fmt.Println(err)
+		return nil, err
 	}
 
 	hourlyAccidentOfCurrentDay, err := ac.AccidentService.GetHourlyAccidentOfCurrentDay(req.Hour)
@@ -80,6 +85,7 @@ func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context,
 		accidentList = append(accidentList, &anAccident)
 	}
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &proto.GetHourlyAccidentOfCurrentDayResponse{
