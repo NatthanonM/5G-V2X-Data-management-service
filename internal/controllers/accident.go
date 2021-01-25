@@ -7,6 +7,8 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AccidentController struct {
@@ -54,6 +56,33 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 		return nil, err
 	}
 	return &proto.GetAllAccidentDataResponse{
+		Accidents: accidentList,
+	}, nil
+}
+
+// GetHourlyAccidentOfCurrentDay ...
+func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context, req *proto.GetHourlyAccidentOfCurrentDayRequest) (*proto.GetHourlyAccidentOfCurrentDayResponse, error) {
+	if req.Hour < 0 || req.Hour > 23 {
+		return nil, status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
+	}
+
+	hourlyAccidentOfCurrentDay, err := ac.AccidentService.GetHourlyAccidentOfCurrentDay(req.Hour)
+
+	var accidentList []*proto.AccidentData
+	for _, elem := range hourlyAccidentOfCurrentDay {
+		anAccident := proto.AccidentData{
+			Username:  elem.Username,
+			CarId:     elem.CarID,
+			Latitude:  elem.Latitude,
+			Longitude: elem.Longitude,
+			Time:      utils.WrapperTime(&elem.Time),
+		}
+		accidentList = append(accidentList, &anAccident)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &proto.GetHourlyAccidentOfCurrentDayResponse{
 		Accidents: accidentList,
 	}, nil
 }

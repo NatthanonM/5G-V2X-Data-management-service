@@ -7,14 +7,14 @@ import (
 )
 
 type AccidentService struct {
-	crud            *repositories.CRUDRepository
-	AccidentService *repositories.AccidentRepository
+	crud               *repositories.CRUDRepository
+	AccidentRepository *repositories.AccidentRepository
 }
 
 func NewAccidentService(crud *repositories.CRUDRepository, accidentRepository *repositories.AccidentRepository) *AccidentService {
 	return &AccidentService{
-		crud:            crud,
-		AccidentService: accidentRepository,
+		crud:               crud,
+		AccidentRepository: accidentRepository,
 	}
 }
 
@@ -36,7 +36,17 @@ func (as *AccidentService) StoreData(username string, carID string, lat float64,
 
 func (as *AccidentService) GetAllRecords() ([]*models.Accident, error) {
 
-	result, err := as.AccidentService.FindAll()
+	result, err := as.AccidentRepository.FindAll()
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (as *AccidentService) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.Accident, error) {
+
+	result, err := as.AccidentRepository.GetHourlyAccidentOfCurrentDay(hour)
 
 	if err != nil {
 		return nil, err
