@@ -70,6 +70,10 @@ func (cn *Container) Configure() {
 		cn.Error = err
 	}
 
+	if err := cn.container.Provide(repositories.NewDrowsinessRepository); err != nil {
+		cn.Error = err
+	}
+
 }
 
 func (cn *Container) Run() *Container {

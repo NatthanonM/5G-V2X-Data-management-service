@@ -17,7 +17,15 @@ message DrowsinessData {
 
 message CreateDrowsinessDataResponse { string drowsiness_id = 1; }
 
+message GetHourlyDrowsinessOfCurrentDayRequest { int32 hour = 1; }
+
+message GetHourlyDrowsinessOfCurrentDayResponse {
+  repeated DrowsinessData drowsinesses = 1;
+}
+
 service DrowsinessService {
   rpc CreateDrowsinessData(DrowsinessData)
       returns (CreateDrowsinessDataResponse) {}
+  rpc GetHourlyDrowsinessOfCurrentDay(GetHourlyDrowsinessOfCurrentDayRequest)
+      returns (GetHourlyDrowsinessOfCurrentDayResponse) {}
 }

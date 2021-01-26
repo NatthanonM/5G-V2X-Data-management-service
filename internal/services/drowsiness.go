@@ -7,12 +7,14 @@ import (
 )
 
 type DrowsinessService struct {
-	crud *repositories.CRUDRepository
+	crud                 *repositories.CRUDRepository
+	DrowsinessRepository *repositories.DrowsinessRepository
 }
 
-func NewDrowsinessService(crud *repositories.CRUDRepository) *DrowsinessService {
+func NewDrowsinessService(crud *repositories.CRUDRepository, drowsinessRepository *repositories.DrowsinessRepository) *DrowsinessService {
 	return &DrowsinessService{
-		crud: crud,
+		crud:                 crud,
+		DrowsinessRepository: drowsinessRepository,
 	}
 }
 
@@ -31,4 +33,12 @@ func (ds *DrowsinessService) StoreData(username string, carID string, lat float6
 		return "", err
 	}
 	return id, nil
+}
+
+func (ds *DrowsinessService) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*models.Drowsiness, error) {
+	result, err := ds.DrowsinessRepository.GetHourlyDrowsinessOfCurrentDay(hour)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
