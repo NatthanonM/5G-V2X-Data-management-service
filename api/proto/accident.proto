@@ -13,6 +13,11 @@ message AccidentData {
   double longitude = 5;
 }
 
+message AccidentStatCalData {
+  string name = 1;
+  repeated int32 data = 2;
+}
+
 message CreateAccidentDataResponse { string accident_id = 1; }
 
 message GetAllAccidentDataResponse { repeated AccidentData accidents = 1; }
@@ -23,10 +28,16 @@ message GetHourlyAccidentOfCurrentDayResponse {
   repeated AccidentData accidents = 1;
 }
 
+message GetNumberOfAccidentCurrentYearResponse{
+  repeated AccidentStatCalData accidents = 1;
+}
+
 service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
   rpc GetAllAccidentData(google.protobuf.Empty)
       returns (GetAllAccidentDataResponse) {}
   rpc GetHourlyAccidentOfCurrentDay(GetHourlyAccidentOfCurrentDayRequest)
       returns (GetHourlyAccidentOfCurrentDayResponse) {}
+  rpc GetNumberOfAccidentCurrentYear(google.protobuf.Empty)
+      returns (GetNumberOfAccidentCurrentYearResponse) {}
 }

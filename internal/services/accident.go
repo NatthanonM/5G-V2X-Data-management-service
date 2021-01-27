@@ -53,3 +53,13 @@ func (as *AccidentService) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.
 	}
 	return result, nil
 }
+
+func (as *AccidentService) GetNumberOfAccidentCurrentYear() ([]*models.AccidentStatCal, error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentCurrentYear()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

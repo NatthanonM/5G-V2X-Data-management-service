@@ -92,3 +92,28 @@ func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context,
 		Accidents: accidentList,
 	}, nil
 }
+
+// GetGetNumberOfAccidentCurrentYear
+func (ac *AccidentController) GetNumberOfAccidentCurrentYear(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentCurrentYearResponse, error) {
+	numberOfAccidentCurrentYear, err := ac.AccidentService.GetNumberOfAccidentCurrentYear()
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	var accidentList []*proto.AccidentStatCalData
+	for _, elem := range numberOfAccidentCurrentYear {
+		anAccident := proto.AccidentStatCalData{
+			Name:  	  elem.Name,
+			Data:     elem.Data,
+		}
+		accidentList = append(accidentList, &anAccident)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	
+	return &proto.GetNumberOfAccidentCurrentYearResponse{
+		Accidents: accidentList,
+	}, nil
+}
