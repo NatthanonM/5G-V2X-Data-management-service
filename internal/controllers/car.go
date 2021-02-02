@@ -4,9 +4,11 @@ import (
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/services"
+	"5g-v2x-data-management-service/internal/utils"
 	proto "5g-v2x-data-management-service/pkg/api"
 	"context"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -37,5 +39,24 @@ func (cc *CarController) RegisterNewCar(ctx context.Context, req *proto.Register
 	}
 	return &proto.RegisterNewCarResponse{
 		CarId: *carID,
+	}, nil
+}
+
+func (cc *CarController) GetCarList(ctx context.Context, req *empty.Empty) (*proto.GetCarListResponse, error) {
+	carList, err := cc.CarService.GetAllCar()
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Internal error.")
+	}
+	var grpcCarList []*proto.Car
+	for _, car := range carList {
+		grpcCarList = append(grpcCarList, &proto.Car{
+			CarId:                     car.CarID,
+			VehicleRegistrationNumber: car.VehicleRegistrationNumber,
+			CarDetail:                 car.CarDetail,
+			RegisteredAt:              utils.WrapperTime(&car.RegisteredAt),
+		})
+	}
+	return &proto.GetCarListResponse{
+		CarList: grpcCarList,
 	}, nil
 }

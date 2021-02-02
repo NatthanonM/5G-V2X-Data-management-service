@@ -6,6 +6,7 @@ import (
 	"5g-v2x-data-management-service/internal/models"
 	"context"
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -63,4 +64,33 @@ func (cr *CarRepository) FindOne(filter map[string]interface{}) (*models.Car, er
 		return nil, err
 	}
 	return result, nil
+}
+
+func (cr *CarRepository) FineAll() ([]*models.Car, error) {
+	collection := cr.MONGO.Client.Database(cr.config.DatabaseName).Collection("car")
+
+	var results []*models.Car
+
+	filter := bson.D{{}}
+	cur, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem models.Car
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.TODO())
+
+	return results, nil
 }

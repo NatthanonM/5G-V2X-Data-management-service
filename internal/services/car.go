@@ -32,3 +32,11 @@ func (cs *CarService) RegisterNewCar(car *models.Car) (*string, error) {
 	}
 	return carID, nil
 }
+
+func (cs *CarService) GetAllCar() ([]*models.Car, error) {
+	carList, err := cs.CarRepository.FineAll()
+	if err != nil {
+		return nil, err
+	}
+	return carList, nil
+}

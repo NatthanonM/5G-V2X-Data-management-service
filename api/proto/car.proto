@@ -2,8 +2,15 @@ syntax = "proto3";
 package proto;
 option go_package = ".;proto";
 
-// import "google/protobuf/timestamp.proto";
-// import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Car {
+  string car_id = 1;
+  string vehicle_registration_number = 2;
+  string car_detail = 3;
+  google.protobuf.Timestamp registered_at = 4;
+}
 
 message RegisterNewCarRequest {
   string car_detail = 1;
@@ -12,6 +19,9 @@ message RegisterNewCarRequest {
 
 message RegisterNewCarResponse { string car_id = 1; }
 
+message GetCarListResponse { repeated Car car_list = 1; }
+
 service CarService {
   rpc RegisterNewCar(RegisterNewCarRequest) returns (RegisterNewCarResponse) {}
+  rpc GetCarList(google.protobuf.Empty) returns (GetCarListResponse) {}
 }
