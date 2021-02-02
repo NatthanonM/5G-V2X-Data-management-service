@@ -61,6 +61,7 @@ func init() {
 func (g *GRPCServer) registerServer() {
 	pkg.RegisterAccidentServiceServer(grpcServe, g.GRPCGateway.ControllerGateway.AccidentController)
 	pkg.RegisterDrowsinessServiceServer(grpcServe, g.GRPCGateway.ControllerGateway.DrowsinessController)
+	pkg.RegisterCarServiceServer(grpcServe, g.GRPCGateway.ControllerGateway.CarController)
 }
 
 func (g *GRPCServer) Start() error {

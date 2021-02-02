@@ -10,6 +10,7 @@ type ControllerGateway struct {
 	dig.In
 	*AccidentController
 	*DrowsinessController
+	*CarController
 }
 
 func NewController(cg *ControllerGateway) *Controller {
