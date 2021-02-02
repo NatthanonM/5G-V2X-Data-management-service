@@ -15,6 +15,16 @@ func NewCarService(carRepository *repositories.CarRepository) *CarService {
 	}
 }
 
+func (cs *CarService) GetCarByVehicleRegistrationNumber(vehRegNo string) (*models.Car, error) {
+	filter := make(map[string]interface{})
+	filter["vehicle_registration_number"] = vehRegNo
+	car, err := cs.CarRepository.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+	return car, nil
+}
+
 func (cs *CarService) RegisterNewCar(car *models.Car) (*string, error) {
 	carID, err := cs.CarRepository.Create(car)
 	if err != nil {
