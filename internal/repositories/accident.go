@@ -251,8 +251,8 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int,startMonth 
 		if err != nil {
 			log.Fatal(err)
 		}
-		street := m[elem.Street]	
-		m[string(elem.Street)] = street + 1
+		street := m[elem.Road]	
+		m[string(elem.Road)] = street + 1
 	}
 
 	if err := cur.Err(); err != nil {

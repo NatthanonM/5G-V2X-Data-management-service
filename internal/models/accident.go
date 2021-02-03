@@ -8,7 +8,7 @@ type Accident struct {
 	Time      time.Time
 	Latitude  float64
 	Longitude float64
-	Street	  string
+	Road	  string
 }
 type AccidentStatCal struct {
 	Name     string     `json:"name"`

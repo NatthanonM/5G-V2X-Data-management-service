@@ -10,7 +10,6 @@ type Drowsiness struct {
 	WorkingHour  float64
 	Latitude     float64
 	Longitude    float64
-	Street	  	 string
 }
 
 type DrowsinessStatCal struct {
