@@ -52,12 +52,20 @@ func (cn *Container) Configure() {
 		cn.Error = err
 	}
 
+	if err := cn.container.Provide(controller.NewCarController); err != nil {
+		cn.Error = err
+	}
+
 	// services
 	if err := cn.container.Provide(services.NewAccidentService); err != nil {
 		cn.Error = err
 	}
 
 	if err := cn.container.Provide(services.NewDrowsinessService); err != nil {
+		cn.Error = err
+	}
+
+	if err := cn.container.Provide(services.NewCarService); err != nil {
 		cn.Error = err
 	}
 
@@ -71,6 +79,10 @@ func (cn *Container) Configure() {
 	}
 
 	if err := cn.container.Provide(repositories.NewDrowsinessRepository); err != nil {
+		cn.Error = err
+	}
+
+	if err := cn.container.Provide(repositories.NewCarRepository); err != nil {
 		cn.Error = err
 	}
 

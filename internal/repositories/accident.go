@@ -127,7 +127,11 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int,month int,year 
 	var dayArr [12]int = ar.dayArr
 	var mt int = 12
 	var mst int = month
+	if(day1 == day && int(month1) == month && year == year1){
+		hour = time.Now().Hour()
+	}
 	days := make([]int32, hour+1)
+
 	for y:= year; y< year1+1 ; y++{
 		if(y== year1){
 			mt = int(month1)
