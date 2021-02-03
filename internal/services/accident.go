@@ -25,7 +25,8 @@ func (as *AccidentService) StoreData(username string, carID string, lat float64,
 	accident.Latitude = lat
 	accident.Longitude = lng
 	accident.Time = time
-
+	accident.Street = "AA"
+	
 	id, err := as.crud.Create("accident", &accident)
 
 	if err != nil {
@@ -54,8 +55,27 @@ func (as *AccidentService) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.
 	return result, nil
 }
 
-func (as *AccidentService) GetNumberOfAccidentCurrentYear() ([]*models.AccidentStatCal, error) {
-	result, err := as.AccidentRepository.GetNumberOfAccidentCurrentYear()
+func (as *AccidentService) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentToCalendar(year)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (as *AccidentService) GetNumberOfAccidentTimeBar(day int,month int,year int) ([]int32, error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentTimeBar(day,month,year)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (as *AccidentService) GetNumberOfAccidentStreet(startDay int,startMonth int,startYear int,endDay int,endMonth int,endYear int) (map[string]int32 , error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentStreet(startDay,startMonth,startYear,endDay,endMonth,endYear)
 
 	if err != nil {
 		return nil, err

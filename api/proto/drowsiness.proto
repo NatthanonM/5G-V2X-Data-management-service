@@ -3,7 +3,7 @@ package proto;
 option go_package = ".;proto";
 
 import "google/protobuf/timestamp.proto";
-// import "google/protobuf/empty.proto";
+import "google/protobuf/empty.proto";
 
 message DrowsinessData {
   string username = 1;
@@ -14,6 +14,10 @@ message DrowsinessData {
   double latitude = 6;
   double longitude = 7;
 }
+message DrowsinessStatCalData {
+  string name = 1;
+  repeated int32 data = 2;
+}
 
 message CreateDrowsinessDataResponse { string drowsiness_id = 1; }
 
@@ -23,9 +27,21 @@ message GetHourlyDrowsinessOfCurrentDayResponse {
   repeated DrowsinessData drowsinesses = 1;
 }
 
+message GetNumberOfDrowsinessToCalendarResponse{
+  repeated DrowsinessStatCalData drowsinesss = 1;
+}
+
+message GetNumberOfDrowsinessTimeBarResponse{
+  repeated int32 drowsinesss = 1;
+}
+
 service DrowsinessService {
   rpc CreateDrowsinessData(DrowsinessData)
       returns (CreateDrowsinessDataResponse) {}
   rpc GetHourlyDrowsinessOfCurrentDay(GetHourlyDrowsinessOfCurrentDayRequest)
       returns (GetHourlyDrowsinessOfCurrentDayResponse) {}
+  rpc GetNumberOfDrowsinessToCalendar(google.protobuf.Empty)
+      returns (GetNumberOfDrowsinessToCalendarResponse) {}
+  rpc GetNumberOfDrowsinessTimeBar(google.protobuf.Empty)
+      returns (GetNumberOfDrowsinessTimeBarResponse) {}
 }

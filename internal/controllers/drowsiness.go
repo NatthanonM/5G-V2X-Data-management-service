@@ -6,7 +6,8 @@ import (
 	proto "5g-v2x-data-management-service/pkg/api"
 	"context"
 	"fmt"
-
+	"github.com/golang/protobuf/ptypes/empty"
+	"time"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -66,5 +67,42 @@ func (dc *DrowsinessController) GetHourlyDrowsinessOfCurrentDay(ctx context.Cont
 	}
 	return &proto.GetHourlyDrowsinessOfCurrentDayResponse{
 		Drowsinesses: drosinessList,
+	}, nil
+}
+
+func (ac *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessToCalendarResponse, error) {
+	year := time.Now().Year()
+	numberOfDrowsinessCurrentYear, err := ac.DrowsinessService.GetNumberOfDrowsinessToCalendar(year)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	var drowsinessList []*proto.DrowsinessStatCalData
+	for _, elem := range numberOfDrowsinessCurrentYear {
+		anDrowsiness := proto.DrowsinessStatCalData{
+			Name:  	  elem.Name,
+			Data:     elem.Data,
+		}
+		drowsinessList = append(drowsinessList, &anDrowsiness)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	
+	return &proto.GetNumberOfDrowsinessToCalendarResponse{
+		Drowsinesss: drowsinessList,
+	}, nil
+}
+
+func (ac *DrowsinessController) GetNumberOfDrowsinessTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessTimeBarResponse, error) {
+	year, month, day := time.Now().Date()
+	numberOfDrowsinessTimeBar, err := ac.DrowsinessService.GetNumberOfDrowsinessTimeBar(day,int(month),year)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &proto.GetNumberOfDrowsinessTimeBarResponse{
+		Drowsinesss: numberOfDrowsinessTimeBar,
 	}, nil
 }

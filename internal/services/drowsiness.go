@@ -19,6 +19,7 @@ func NewDrowsinessService(crud *repositories.CRUDRepository, drowsinessRepositor
 }
 
 func (ds *DrowsinessService) StoreData(username string, carID string, lat float64, lng float64, time time.Time, responseTime float64, workingHour float64) (string, error) {
+	
 	var drowsiness models.Drowsiness
 	drowsiness.Username = username
 	drowsiness.CarID = carID
@@ -27,6 +28,7 @@ func (ds *DrowsinessService) StoreData(username string, carID string, lat float6
 	drowsiness.Time = time
 	drowsiness.WorkingHour = workingHour
 	drowsiness.ResponseTime = responseTime
+	drowsiness.Street = "st. chon" 
 	id, err := ds.crud.Create("drowsiness", &drowsiness)
 
 	if err != nil {
@@ -40,5 +42,24 @@ func (ds *DrowsinessService) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*mod
 	if err != nil {
 		return nil, err
 	}
+	return result, nil
+}
+
+func (as *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
+	result, err := as.DrowsinessRepository.GetNumberOfDrowsinessToCalendar(year)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (as *DrowsinessService) GetNumberOfDrowsinessTimeBar(day int,month int,year int) ([]int32, error) {
+	result, err := as.DrowsinessRepository.GetNumberOfDrowsinessTimeBar(day,month,year)
+	if err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
