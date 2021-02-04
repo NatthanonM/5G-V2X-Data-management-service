@@ -17,6 +17,13 @@ message CreateAccidentDataResponse { string accident_id = 1; }
 
 message GetAllAccidentDataResponse { repeated AccidentData accidents = 1; }
 
+message GetAccidentDataRequest {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+}
+
+message GetAccidentDataResponse { repeated AccidentData accidents = 1; }
+
 message GetHourlyAccidentOfCurrentDayRequest { int32 hour = 1; }
 
 message GetHourlyAccidentOfCurrentDayResponse {
@@ -27,6 +34,8 @@ service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
   rpc GetAllAccidentData(google.protobuf.Empty)
       returns (GetAllAccidentDataResponse) {}
+  rpc GetAccidentData(GetAccidentDataRequest)
+      returns (GetAccidentDataResponse) {}
   rpc GetHourlyAccidentOfCurrentDay(GetHourlyAccidentOfCurrentDayRequest)
       returns (GetHourlyAccidentOfCurrentDayResponse) {}
 }

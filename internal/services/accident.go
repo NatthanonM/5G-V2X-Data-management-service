@@ -3,7 +3,10 @@ package services
 import (
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/repositories"
+	"fmt"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type AccidentService struct {
@@ -37,6 +40,31 @@ func (as *AccidentService) StoreData(username string, carID string, lat float64,
 func (as *AccidentService) GetAllRecords() ([]*models.Accident, error) {
 
 	result, err := as.AccidentRepository.FindAll()
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (as *AccidentService) GetRecords(from, to time.Time) ([]*models.Accident, error) {
+
+	filter := bson.D{
+		{
+			"time", bson.D{
+				{"$gt", from},
+				{"$lte", to},
+			},
+		},
+	}
+
+	fmt.Println(from, "-", to)
+
+	result, err := as.AccidentRepository.Find(filter)
+
+	for _, res := range result {
+		fmt.Println(res.Time)
+	}
 
 	if err != nil {
 		return nil, err

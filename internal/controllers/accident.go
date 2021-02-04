@@ -63,6 +63,30 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 	}, nil
 }
 
+// GetAllAccidentData ...
+func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.GetAccidentDataRequest) (*proto.GetAccidentDataResponse, error) {
+	records, err := ac.AccidentService.GetRecords(req.From.AsTime(), req.To.AsTime())
+
+	var accidentList []*proto.AccidentData
+	for _, elem := range records {
+		anAccident := proto.AccidentData{
+			Username:  elem.Username,
+			CarId:     elem.CarID,
+			Latitude:  elem.Latitude,
+			Longitude: elem.Longitude,
+			Time:      utils.WrapperTime(&elem.Time),
+		}
+		accidentList = append(accidentList, &anAccident)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &proto.GetAccidentDataResponse{
+		Accidents: accidentList,
+	}, nil
+}
+
 // GetHourlyAccidentOfCurrentDay ...
 func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context, req *proto.GetHourlyAccidentOfCurrentDayRequest) (*proto.GetHourlyAccidentOfCurrentDayResponse, error) {
 	if req.Hour < 0 || req.Hour > 23 {

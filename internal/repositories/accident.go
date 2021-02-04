@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
@@ -33,6 +34,34 @@ func (ar *AccidentRepository) FindAll() ([]*models.Accident, error) {
 	var results []*models.Accident
 
 	filter := bson.D{{}}
+	cur, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem models.Accident
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.TODO())
+
+	return results, nil
+}
+
+func (ar *AccidentRepository) Find(filter primitive.D) ([]*models.Accident, error) {
+	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+
+	var results []*models.Accident
+
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
