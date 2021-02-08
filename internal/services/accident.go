@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type AccidentService struct {
@@ -47,18 +48,33 @@ func (as *AccidentService) GetAllRecords() ([]*models.Accident, error) {
 	return result, nil
 }
 
-func (as *AccidentService) GetRecords(from, to time.Time) ([]*models.Accident, error) {
+func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID *string) ([]*models.Accident, error) {
+	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
+	toTime := time.Now()
+	if from != nil {
+		fromTime = from.AsTime()
+	}
+	if to != nil {
+		toTime = to.AsTime()
+	}
 
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", from},
-				{"$lte", to},
+				{"$gt", fromTime},
+				{"$lte", toTime},
 			},
 		},
 	}
 
-	fmt.Println(from, "-", to)
+	if carID != nil {
+		filter = append(filter, bson.E{
+			"car_id", carID,
+		})
+	}
+
+	fmt.Println(fromTime, "-", toTime)
+	fmt.Println(filter)
 
 	result, err := as.AccidentRepository.Find(filter)
 

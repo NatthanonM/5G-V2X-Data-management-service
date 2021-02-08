@@ -68,3 +68,30 @@ func (dc *DrowsinessController) GetHourlyDrowsinessOfCurrentDay(ctx context.Cont
 		Drowsinesses: drosinessList,
 	}, nil
 }
+
+func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *proto.GetDrowsinessDataRequest) (*proto.GetDrowsinessDataResponse, error) {
+	if req.CarId == nil {
+		err := status.Error(codes.InvalidArgument, "Car id must not be empty")
+		return nil, err
+	}
+	drowsinessData, err := dc.DrowsinessService.GetDrowsiness(req.CarId)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	drowsinesses := []*proto.DrowsinessData{}
+	for _, drowsiness := range drowsinessData {
+		drowsinesses = append(drowsinesses, &proto.DrowsinessData{
+			CarId:        drowsiness.CarID,
+			Username:     drowsiness.Username,
+			Time:         utils.WrapperTime(&drowsiness.Time),
+			ResponseTime: drowsiness.ResponseTime,
+			WorkingHour:  drowsiness.WorkingHour,
+			Latitude:     drowsiness.Latitude,
+			Longitude:    drowsiness.Longitude,
+		})
+	}
+	return &proto.GetDrowsinessDataResponse{
+		Drowsinesses: drowsinesses,
+	}, nil
+}

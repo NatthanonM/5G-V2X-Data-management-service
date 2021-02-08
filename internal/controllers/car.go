@@ -32,6 +32,7 @@ func (cc *CarController) RegisterNewCar(ctx context.Context, req *proto.Register
 	car := models.Car{
 		CarDetail:                 req.CarDetail,
 		VehicleRegistrationNumber: req.VehicleRegistrationNumber,
+		CreatedAt:                 req.CreatedAt.AsTime(),
 	}
 	carID, err := cc.CarService.RegisterNewCar(&car)
 	if err != nil {
@@ -54,9 +55,24 @@ func (cc *CarController) GetCarList(ctx context.Context, req *empty.Empty) (*pro
 			VehicleRegistrationNumber: car.VehicleRegistrationNumber,
 			CarDetail:                 car.CarDetail,
 			RegisteredAt:              utils.WrapperTime(&car.RegisteredAt),
+			CreatedAt:                 utils.WrapperTime(&car.CreatedAt),
 		})
 	}
 	return &proto.GetCarListResponse{
 		CarList: grpcCarList,
+	}, nil
+}
+
+func (cc *CarController) GetCar(ctx context.Context, req *proto.GetCarResponse) (*proto.Car, error) {
+	car, err := cc.CarService.GetCar(req.CarId)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.Car{
+		CarId:                     car.CarID,
+		VehicleRegistrationNumber: car.VehicleRegistrationNumber,
+		CarDetail:                 car.CarDetail,
+		RegisteredAt:              utils.WrapperTime(&car.RegisteredAt),
+		CreatedAt:                 utils.WrapperTime(&car.CreatedAt),
 	}, nil
 }

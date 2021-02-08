@@ -63,9 +63,9 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 	}, nil
 }
 
-// GetAllAccidentData ...
+// GetAccidentData ...
 func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.GetAccidentDataRequest) (*proto.GetAccidentDataResponse, error) {
-	records, err := ac.AccidentService.GetRecords(req.From.AsTime(), req.To.AsTime())
+	records, err := ac.AccidentService.GetRecords(req.From, req.To, req.CarId)
 
 	var accidentList []*proto.AccidentData
 	for _, elem := range records {

@@ -42,3 +42,15 @@ func (ds *DrowsinessService) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*mod
 	}
 	return result, nil
 }
+
+func (ds *DrowsinessService) GetDrowsiness(carID *string) ([]*models.Drowsiness, error) {
+	filter := make(map[string]interface{})
+	if carID != nil {
+		filter["car_id"] = *carID
+	}
+	drowsinessData, err := ds.DrowsinessRepository.Find(filter)
+	if err != nil {
+		return nil, err
+	}
+	return drowsinessData, nil
+}

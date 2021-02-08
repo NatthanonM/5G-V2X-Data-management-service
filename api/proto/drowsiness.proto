@@ -23,9 +23,15 @@ message GetHourlyDrowsinessOfCurrentDayResponse {
   repeated DrowsinessData drowsinesses = 1;
 }
 
+message GetDrowsinessDataRequest { optional string car_id = 1; }
+
+message GetDrowsinessDataResponse { repeated DrowsinessData drowsinesses = 1; }
+
 service DrowsinessService {
   rpc CreateDrowsinessData(DrowsinessData)
       returns (CreateDrowsinessDataResponse) {}
   rpc GetHourlyDrowsinessOfCurrentDay(GetHourlyDrowsinessOfCurrentDayRequest)
       returns (GetHourlyDrowsinessOfCurrentDayResponse) {}
+  rpc GetDrowsinessData(GetDrowsinessDataRequest)
+      returns (GetDrowsinessDataResponse) {}
 }

@@ -18,8 +18,9 @@ message CreateAccidentDataResponse { string accident_id = 1; }
 message GetAllAccidentDataResponse { repeated AccidentData accidents = 1; }
 
 message GetAccidentDataRequest {
-  google.protobuf.Timestamp from = 1;
-  google.protobuf.Timestamp to = 2;
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+  optional string car_id = 3;
 }
 
 message GetAccidentDataResponse { repeated AccidentData accidents = 1; }

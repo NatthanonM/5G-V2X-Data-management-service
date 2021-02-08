@@ -66,7 +66,7 @@ func (cr *CarRepository) FindOne(filter map[string]interface{}) (*models.Car, er
 	return result, nil
 }
 
-func (cr *CarRepository) FineAll() ([]*models.Car, error) {
+func (cr *CarRepository) FindAll() ([]*models.Car, error) {
 	collection := cr.MONGO.Client.Database(cr.config.DatabaseName).Collection("car")
 
 	var results []*models.Car
