@@ -132,7 +132,7 @@ func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*mode
 func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year int, hour int32) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 	fromHour := time.Date(year, time.Month(month), day, int(hour), 0, 0, 0, time.UTC)
-	toHour := time.Date(year, time.Month(month), day, int(hour), 59, 99, 999, time.UTC)
+	toHour := time.Date(year, time.Month(month), day, int(hour)+1, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
@@ -200,8 +200,12 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, yea
 
 func (ar *AccidentRepository) GetNumberOfAccidentDay(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+	var end int = endDay+1
+	if(startMonth!=endMonth){
+		end = 1
+	}
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), endDay, 23, 59, 99, 999, time.UTC)
+	toHour := time.Date(endYear, time.Month(endMonth), end, 0, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
@@ -259,8 +263,12 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 
 func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (map[string]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+	var end int = endDay+1
+	if(startMonth!=endMonth){
+		end = 1
+	}
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), endDay, 23, 59, 99, 999, time.UTC)
+	toHour := time.Date(endYear, time.Month(endMonth), end, 0, 0, 0, 0, time.UTC)
 	m := make(map[string]int32)
 	filter := bson.D{
 		{
