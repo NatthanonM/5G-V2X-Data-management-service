@@ -11,15 +11,16 @@ message AccidentData {
   google.protobuf.Timestamp time = 3;
   double latitude = 4;
   double longitude = 5;
+  string road = 6;
 }
 
 message AccidentStatCalData {
   string name = 1;
   repeated int32 data = 2;
 }
-message AccidentStatPieData{
-	repeated int32 series  = 1;
-	repeated string labels = 2;
+message AccidentStatPieData {
+  repeated int32 series = 1;
+  repeated string labels = 2;
 }
 
 message CreateAccidentDataResponse { string accident_id = 1; }
@@ -30,6 +31,7 @@ message GetAccidentDataRequest {
   optional google.protobuf.Timestamp from = 1;
   optional google.protobuf.Timestamp to = 2;
   optional string car_id = 3;
+  optional string username = 4;
 }
 
 message GetAccidentDataResponse { repeated AccidentData accidents = 1; }
@@ -40,17 +42,13 @@ message GetHourlyAccidentOfCurrentDayResponse {
   repeated AccidentData accidents = 1;
 }
 
-message GetNumberOfAccidentToCalendarResponse{
+message GetNumberOfAccidentToCalendarResponse {
   repeated AccidentStatCalData accidents = 1;
 }
 
-message GetNumberOfAccidentTimeBarResponse{
-  repeated int32 accidents = 1;
-}
+message GetNumberOfAccidentTimeBarResponse { repeated int32 accidents = 1; }
 
-message GetNumberOfAccidentStreetResponse{
-  AccidentStatPieData accidents = 1;
-}
+message GetNumberOfAccidentStreetResponse { AccidentStatPieData accidents = 1; }
 
 service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}

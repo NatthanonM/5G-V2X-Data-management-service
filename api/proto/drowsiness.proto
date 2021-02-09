@@ -13,6 +13,7 @@ message DrowsinessData {
   double working_hour = 5;
   double latitude = 6;
   double longitude = 7;
+  string road = 8;
 }
 message DrowsinessStatCalData {
   string name = 1;

@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -65,7 +66,7 @@ func (ac *AccidentController) GetAllAccidentData(ctx context.Context, req *empty
 
 // GetAccidentData ...
 func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.GetAccidentDataRequest) (*proto.GetAccidentDataResponse, error) {
-	records, err := ac.AccidentService.GetRecords(req.From, req.To, req.CarId)
+	records, err := ac.AccidentService.GetRecords(req.From, req.To, req.CarId, req.Username)
 
 	var accidentList []*proto.AccidentData
 	for _, elem := range records {
@@ -75,6 +76,7 @@ func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.Ge
 			Latitude:  elem.Latitude,
 			Longitude: elem.Longitude,
 			Time:      utils.WrapperTime(&elem.Time),
+			Road:      elem.Road,
 		}
 		accidentList = append(accidentList, &anAccident)
 	}
@@ -105,6 +107,7 @@ func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context,
 			Latitude:  elem.Latitude,
 			Longitude: elem.Longitude,
 			Time:      utils.WrapperTime(&elem.Time),
+			Road:      elem.Road,
 		}
 		accidentList = append(accidentList, &anAccident)
 	}
@@ -117,7 +120,7 @@ func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context,
 	}, nil
 }
 
-// GetGetNumberOfAccidentCurrentYearDetailDay
+// GetNumberOfAccidentToCalendar
 func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentToCalendarResponse, error) {
 	year := time.Now().Year()
 	numberOfAccidentCurrentYear, err := ac.AccidentService.GetNumberOfAccidentToCalendar(year)
@@ -128,8 +131,8 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 	var accidentList []*proto.AccidentStatCalData
 	for _, elem := range numberOfAccidentCurrentYear {
 		anAccident := proto.AccidentStatCalData{
-			Name:  	  elem.Name,
-			Data:     elem.Data,
+			Name: elem.Name,
+			Data: elem.Data,
 		}
 		accidentList = append(accidentList, &anAccident)
 	}
@@ -137,7 +140,7 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 		fmt.Println(err)
 		return nil, err
 	}
-	
+
 	return &proto.GetNumberOfAccidentToCalendarResponse{
 		Accidents: accidentList,
 	}, nil
@@ -147,7 +150,7 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentTimeBarResponse, error) {
 	year, month, day := time.Now().Date()
 
-	numberOfAccidentTimeBar, err := ac.AccidentService.GetNumberOfAccidentTimeBar(day,int(month),year)
+	numberOfAccidentTimeBar, err := ac.AccidentService.GetNumberOfAccidentTimeBar(day, int(month), year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -161,18 +164,18 @@ func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req
 	year, month, day := time.Now().Date()
 	var no []int32
 	var label []string
-	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(day,int(month),year,day,int(month),year)
+	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(day, int(month), year, day, int(month), year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	for k, v := range acStreet {
-		label= append(label,string(k))
+		label = append(label, string(k))
 		no = append(no, int32(v))
 	}
 	anAccident := &proto.AccidentStatPieData{
 		Series: no,
-		Labels: label,		
+		Labels: label,
 	}
 	return &proto.GetNumberOfAccidentStreetResponse{
 		Accidents: anAccident,

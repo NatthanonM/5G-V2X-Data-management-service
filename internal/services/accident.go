@@ -49,7 +49,7 @@ func (as *AccidentService) GetAllRecords() ([]*models.Accident, error) {
 	return result, nil
 }
 
-func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID *string) ([]*models.Accident, error) {
+func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, username *string) ([]*models.Accident, error) {
 	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
 	toTime := time.Now()
 	if from != nil {
@@ -71,6 +71,12 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID *st
 	if carID != nil {
 		filter = append(filter, bson.E{
 			"car_id", carID,
+		})
+	}
+
+	if username != nil {
+		filter = append(filter, bson.E{
+			"username", username,
 		})
 	}
 
