@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 	"time"
-
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -93,7 +93,7 @@ func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*mode
 
 	var results []*models.Accident
 
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
@@ -151,32 +151,35 @@ func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year i
 }
 
 func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, year int) ([]int32, error) {
-	year1, month1, day1 := time.Now().Date()
+	year1, month1, day1 := time.Now().UTC().Date()
 	hour := 23
 	var dayArr [12]int = ar.dayArr
 	var mt int = 12
-	var mst int = month
+	var mst int = 1
+	var daySt int = 1
 	if day1 == day && int(month1) == month && year == year1 {
-		hour = time.Now().Hour()
+		hour = time.Now().UTC().Hour()
+		daySt = day
+		dayArr[month-1] = day
 	}
 	days := make([]int32, hour+1)
 
 	for y := year; y < year1+1; y++ {
-		if y == year1 {
-			mt = int(month1)
-			dayArr[mt-1] = day1
-		}
-		if y%400 == 0 || (y%4 == 0 && !(y%100 == 0)) {
-			dayArr[1] = 29
-			dayArr[1] = 29
+		fmt.Println(y)
+		if (y%400 == 0 || (y%4 == 0 && !(y%100 == 0))) {
 			dayArr[1] = 29
 		} else {
 			dayArr[1] = 28
 		}
+		if y == year1 {
+			mst = month
+			mt = int(month1)
+			dayArr[mt-1] = day1
+		}
 		for m := mst; m <= mt; m++ {
-			for d := 1; d <= dayArr[m-1]; d++ {
+			for d := daySt; d <= dayArr[m-1]; d++ {
 				if day1 == d && int(month1) == m && y == year1 {
-					hour = time.Now().Hour()
+					hour = time.Now().UTC().Hour()
 				}
 				for i := 0; i <= hour; i++ {
 					cur, err := ar.GetNumberOfAccidentHour(d, m, y, int32(i))
@@ -217,7 +220,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentDay(startDay int, startMonth in
 }
 
 func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
-	year1, month, day := time.Now().Date()
+	year1, month, day := time.Now().UTC().Date()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	var dayArr [12]int = ar.dayArr
 
