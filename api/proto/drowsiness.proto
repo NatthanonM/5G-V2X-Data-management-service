@@ -28,7 +28,10 @@ message GetHourlyDrowsinessOfCurrentDayResponse {
   repeated DrowsinessData drowsinesses = 1;
 }
 
-message GetDrowsinessDataRequest { optional string car_id = 1; }
+message GetDrowsinessDataRequest {
+  optional string car_id = 1;
+  optional string username = 2;
+}
 
 message GetDrowsinessDataResponse { repeated DrowsinessData drowsinesses = 1; }
 

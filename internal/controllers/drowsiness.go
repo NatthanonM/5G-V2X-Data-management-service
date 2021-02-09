@@ -72,11 +72,11 @@ func (dc *DrowsinessController) GetHourlyDrowsinessOfCurrentDay(ctx context.Cont
 }
 
 func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *proto.GetDrowsinessDataRequest) (*proto.GetDrowsinessDataResponse, error) {
-	if req.CarId == nil {
-		err := status.Error(codes.InvalidArgument, "Car id must not be empty")
+	if req.CarId == nil && req.Username == nil {
+		err := status.Error(codes.InvalidArgument, "Car id or username must be provided")
 		return nil, err
 	}
-	drowsinessData, err := dc.DrowsinessService.GetDrowsiness(req.CarId)
+	drowsinessData, err := dc.DrowsinessService.GetDrowsiness(req.CarId, req.Username)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

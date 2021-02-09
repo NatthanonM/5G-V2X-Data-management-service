@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
@@ -96,7 +97,7 @@ func (dr *DrowsinessRepository) FindOne(filter map[string]interface{}) (*models.
 	return result, nil
 }
 
-func (dr *DrowsinessRepository) Find(filter map[string]interface{}) ([]*models.Drowsiness, error) {
+func (dr *DrowsinessRepository) Find(filter primitive.D) ([]*models.Drowsiness, error) {
 	collection := dr.MONGO.Client.Database(dr.config.DatabaseName).Collection("drowsiness")
 
 	var results []*models.Drowsiness

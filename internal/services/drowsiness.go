@@ -4,6 +4,8 @@ import (
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/repositories"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type DrowsinessService struct {
@@ -45,10 +47,17 @@ func (ds *DrowsinessService) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*mod
 	return result, nil
 }
 
-func (ds *DrowsinessService) GetDrowsiness(carID *string) ([]*models.Drowsiness, error) {
-	filter := make(map[string]interface{})
+func (ds *DrowsinessService) GetDrowsiness(carID, username *string) ([]*models.Drowsiness, error) {
+	filter := bson.D{{}}
 	if carID != nil {
-		filter["car_id"] = *carID
+		filter = append(filter, bson.E{
+			"car_id", *carID,
+		})
+	}
+	if username != nil {
+		filter = append(filter, bson.E{
+			"username", *username,
+		})
 	}
 	drowsinessData, err := ds.DrowsinessRepository.Find(filter)
 	if err != nil {
