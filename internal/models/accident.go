@@ -8,4 +8,9 @@ type Accident struct {
 	Time      time.Time `bson:"time"`
 	Latitude  float64   `bson:"latitude"`
 	Longitude float64   `bson:"longitude"`
+	Road      string    `bson:"road"`
+}
+type AccidentStatCal struct {
+	Name string  `json:"name"`
+	Data []int32 `json:"data"`
 }

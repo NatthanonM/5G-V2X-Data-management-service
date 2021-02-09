@@ -10,4 +10,10 @@ type Drowsiness struct {
 	WorkingHour  float64   `bson:"working_hour"`
 	Latitude     float64   `bson:"latitude"`
 	Longitude    float64   `bson:"longitude"`
+	Road         string    `bson:"road"`
+}
+
+type DrowsinessStatCal struct {
+	Name string  `json:"name"`
+	Data []int32 `json:"data"`
 }
