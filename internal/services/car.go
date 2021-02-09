@@ -3,7 +3,6 @@ package services
 import (
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/repositories"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -46,6 +45,7 @@ func (cs *CarService) GetAllCar() ([]*models.Car, error) {
 
 func (cs *CarService) GetCar(carID string) (*models.Car, error) {
 	filter := make(map[string]interface{})
+	
 	filter["_id"] = carID
 	car, err := cs.CarRepository.FindOne(filter)
 	if err != nil {
