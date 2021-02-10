@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
@@ -100,8 +101,8 @@ func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*mode
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -136,8 +137,8 @@ func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year i
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -200,17 +201,13 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, yea
 
 func (ar *AccidentRepository) GetNumberOfAccidentDay(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
-	var end int = endDay+1
-	if(startMonth!=endMonth){
-		end = 1
-	}
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), end, 0, 0, 0, 0, time.UTC)
+	toHour := time.Date(endYear, time.Month(endMonth), endDay, 0, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -243,11 +240,20 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 		result.Name = monthArr[j]
 		days := make([]int32, dayArr[j])
 		for i := 1; i <= dayArr[j]; i++ {
-			cur, err := ar.GetNumberOfAccidentDay(i, j+1, year, i, j+1, year)
-			if err != nil {
-				log.Fatal(err)
+			if(i==dayArr[j]){
+				cur, err := ar.GetNumberOfAccidentDay(i, j+1, year, 1, j+2, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
+			}else{
+				cur, err := ar.GetNumberOfAccidentDay(i, j+1, year, i+1, j+1, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
 			}
-			days[i-1] = cur
+			
 			if i == day && int(month)-1 == j {
 				break
 			}
@@ -261,43 +267,45 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 	return results, nil
 }
 
-func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (map[string]int32, error) {
+func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int) (map[string]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
-	var end int = endDay+1
-	if(startMonth!=endMonth){
-		end = 1
-	}
+	year, month, day := time.Now().UTC().Date()
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), end, 0, 0, 0, 0, time.UTC)
+	toHour := time.Date(year, month, day, 23, 59, 99, 999, time.UTC)
 	m := make(map[string]int32)
-	filter := bson.D{
-		{
-			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
-			},
-		},
-	}
 
-	cur, err := collection.Find(context.TODO(), filter)
+	groupStage := bson.D{{"$group", bson.D{{"_id", "$road"}, {"total", bson.D{{"$sum", 1}}}}}}
+
+	matchStage := bson.D{{"$match", bson.D{{
+		"time", bson.D{
+			{"$gte", fromHour},
+			{"$lte", toHour},
+		},
+	}}}}
+
+	cur, err := collection.Aggregate(context.TODO(),mongo.Pipeline{matchStage, groupStage})
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for cur.Next(context.TODO()) {
-		var elem models.Accident
+		var elem models.NumberOfAccidentRoad
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
 		}
-		street := m[elem.Road]
-		m[string(elem.Road)] = street + 1
+		if(elem.ID!=""){
+			m[elem.ID] = elem.Total
+		}else{
+			m["์N/A"] = elem.Total
+		}
 	}
 
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	return m, nil
+	cur.Close(context.TODO())
+	fmt.Println(m)
 
+	return m ,nil
 }

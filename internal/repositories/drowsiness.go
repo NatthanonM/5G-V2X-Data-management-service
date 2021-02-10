@@ -36,7 +36,7 @@ func (dr *DrowsinessRepository) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*
 
 	var results []*models.Drowsiness
 
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
@@ -127,17 +127,13 @@ func (dr *DrowsinessRepository) Find(filter primitive.D) ([]*models.Drowsiness, 
 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
-	var end int = endDay+1
-	if(startMonth!=endMonth){
-		end = 1
-	}
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), end, 0, 0, 0, 0, time.UTC)
+	toHour := time.Date(endYear, time.Month(endMonth), endDay, 0, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -170,11 +166,19 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 		result.Name = monthArr[j]
 		days := make([]int32, dayArr[j])
 		for i := 1; i <= dayArr[j]; i++ {
-			cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, i, j+1, year)
-			if err != nil {
-				log.Fatal(err)
+			if(i==dayArr[j]){
+				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, 1, j+2, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
+			}else{
+				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, i+1, j+1, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
 			}
-			days[i-1] = cur
 			if i == day && int(month)-1 == j {
 				break
 			}
@@ -196,8 +200,8 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, ye
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}

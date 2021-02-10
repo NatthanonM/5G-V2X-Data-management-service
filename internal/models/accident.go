@@ -14,3 +14,7 @@ type AccidentStatCal struct {
 	Name string  `json:"name"`
 	Data []int32 `json:"data"`
 }
+type NumberOfAccidentRoad struct {
+	ID    string `bson:"_id" json:"id"`
+	Total int32 `json:"total"`
+}

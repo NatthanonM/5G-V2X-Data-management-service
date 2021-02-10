@@ -124,8 +124,8 @@ func (as *AccidentService) GetNumberOfAccidentTimeBar(day int, month int, year i
 	return result, nil
 }
 
-func (as *AccidentService) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (map[string]int32, error) {
-	result, err := as.AccidentRepository.GetNumberOfAccidentStreet(startDay, startMonth, startYear, endDay, endMonth, endYear)
+func (as *AccidentService) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int) (map[string]int32, error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentStreet(startDay, startMonth, startYear)
 
 	if err != nil {
 		return nil, err
