@@ -94,7 +94,7 @@ func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*mode
 
 	var results []*models.Accident
 
-	year, month, day := time.Now().UTC().Date()
+	year, month, day := time.Now().Date()
 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
@@ -152,14 +152,14 @@ func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year i
 }
 
 func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, year int) ([]int32, error) {
-	year1, month1, day1 := time.Now().UTC().Date()
+	year1, month1, day1 := time.Now().Date()
 	hour := 23
 	var dayArr [12]int = ar.dayArr
 	var mt int = 12
 	var mst int = 1
 	var daySt int = 1
 	if day1 == day && int(month1) == month && year == year1 {
-		hour = time.Now().UTC().Hour()
+		hour = time.Now().Hour()
 		daySt = day
 		dayArr[month-1] = day
 	}
@@ -180,7 +180,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, yea
 		for m := mst; m <= mt; m++ {
 			for d := daySt; d <= dayArr[m-1]; d++ {
 				if day1 == d && int(month1) == m && y == year1 {
-					hour = time.Now().UTC().Hour()
+					hour = time.Now().Hour()
 				}
 				for i := 0; i <= hour; i++ {
 					cur, err := ar.GetNumberOfAccidentHour(d, m, y, int32(i))
@@ -221,7 +221,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentDay(startDay int, startMonth in
 }
 
 func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
-	year1, month, day := time.Now().UTC().Date()
+	year1, month, day := time.Now().Date()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	var dayArr [12]int = ar.dayArr
 
@@ -269,7 +269,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 
 func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int) (map[string]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
-	year, month, day := time.Now().UTC().Date()
+	year, month, day := time.Now().Date()
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, 23, 59, 99, 999, time.UTC)
 	m := make(map[string]int32)

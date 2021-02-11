@@ -36,7 +36,7 @@ func (dr *DrowsinessRepository) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*
 
 	var results []*models.Drowsiness
 
-	year, month, day := time.Now().UTC().Date()
+	year, month, day := time.Now().Date()
 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
@@ -147,7 +147,7 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMo
 }
 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
-	year1, month, day := time.Now().UTC().Date()
+	year1, month, day := time.Now().Date()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	var dayArr [12]int = ar.dayArr
 
@@ -215,14 +215,14 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, ye
 }
 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
-	year1, month1, day1 := time.Now().UTC().Date()
+	year1, month1, day1 := time.Now().Date()
 	hour := 23
 	var dayArr [12]int = ar.dayArr
 	var mt int = 12
 	var mst int = 1
 	var daySt int = 1
 	if day1 == day && int(month1) == month && year == year1 {
-		hour = time.Now().UTC().Hour()
+		hour = time.Now().Hour()
 		daySt = day
 		dayArr[month-1] = day
 	}
@@ -242,7 +242,7 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int,
 		for m := mst; m <= mt; m++ {
 			for d := daySt; d <= dayArr[m-1]; d++ {
 				if day1 == d && int(month1) == m && y == year1 {
-					hour = time.Now().UTC().Hour()
+					hour = time.Now().Hour()
 				}
 				for i := 0; i <= hour; i++ {
 					cur, err := ar.GetNumberOfDrowsinessHour(d, m, y, int32(i))
