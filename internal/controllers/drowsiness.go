@@ -99,6 +99,7 @@ func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *prot
 			WorkingHour:  drowsiness.WorkingHour,
 			Latitude:     drowsiness.Latitude,
 			Longitude:    drowsiness.Longitude,
+			Road:         drowsiness.Road,
 		})
 	}
 	return &proto.GetDrowsinessDataResponse{
