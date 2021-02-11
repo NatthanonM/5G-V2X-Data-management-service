@@ -15,18 +15,26 @@ import (
 
 type DrowsinessController struct {
 	*services.DrowsinessService
+	*services.GoogleService
 }
 
-func NewDrowsinessController(drowsinessSrvc *services.DrowsinessService) *DrowsinessController {
+func NewDrowsinessController(drowsinessSrvc *services.DrowsinessService, googleSrvc *services.GoogleService) *DrowsinessController {
 	return &DrowsinessController{
 		DrowsinessService: drowsinessSrvc,
+		GoogleService:     googleSrvc,
 	}
 }
 
 func (dc *DrowsinessController) CreateDrowsinessData(ctx context.Context, req *proto.DrowsinessData) (*proto.CreateDrowsinessDataResponse, error) {
+	road, err := dc.GoogleService.ReverseGeocoding(req.Latitude, req.Longitude)
+	if err != nil {
+		return nil, err
+	}
+
 	drowsinessID, err := dc.DrowsinessService.StoreData(
 		req.Username,
 		req.CarId,
+		*road,
 		req.Latitude,
 		req.Longitude,
 		*utils.WrapperTimeStamp(req.Time),

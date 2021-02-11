@@ -15,18 +15,26 @@ import (
 
 type AccidentController struct {
 	*services.AccidentService
+	*services.GoogleService
 }
 
-func NewAccidentController(accidentSrvc *services.AccidentService) *AccidentController {
+func NewAccidentController(accidentSrvc *services.AccidentService, googleSrvc *services.GoogleService) *AccidentController {
 	return &AccidentController{
 		AccidentService: accidentSrvc,
+		GoogleService:   googleSrvc,
 	}
 }
 
 func (ac *AccidentController) CreateAccidentData(ctx context.Context, req *proto.AccidentData) (*proto.CreateAccidentDataResponse, error) {
+	road, err := ac.GoogleService.ReverseGeocoding(req.Latitude, req.Longitude)
+	if err != nil {
+		return nil, err
+	}
+
 	accidentID, err := ac.AccidentService.StoreData(
 		req.Username,
 		req.CarId,
+		*road,
 		req.Latitude,
 		req.Longitude,
 		*utils.WrapperTimeStamp(req.Time),

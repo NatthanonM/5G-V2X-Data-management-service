@@ -22,14 +22,14 @@ func NewAccidentService(crud *repositories.CRUDRepository, accidentRepository *r
 	}
 }
 
-func (as *AccidentService) StoreData(username string, carID string, lat float64, lng float64, time time.Time) (string, error) {
+func (as *AccidentService) StoreData(username, carID, road string, lat float64, lng float64, time time.Time) (string, error) {
 	var accident models.Accident
 	accident.Username = username
 	accident.CarID = carID
 	accident.Latitude = lat
 	accident.Longitude = lng
 	accident.Time = time
-	accident.Road = "AA"
+	accident.Road = road
 
 	id, err := as.crud.Create("accident", &accident)
 

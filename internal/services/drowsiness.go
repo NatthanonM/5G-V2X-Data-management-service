@@ -20,7 +20,7 @@ func NewDrowsinessService(crud *repositories.CRUDRepository, drowsinessRepositor
 	}
 }
 
-func (ds *DrowsinessService) StoreData(username string, carID string, lat float64, lng float64, time time.Time, responseTime float64, workingHour float64) (string, error) {
+func (ds *DrowsinessService) StoreData(username, carID, road string, lat float64, lng float64, time time.Time, responseTime float64, workingHour float64) (string, error) {
 
 	var drowsiness models.Drowsiness
 	drowsiness.Username = username
@@ -30,7 +30,7 @@ func (ds *DrowsinessService) StoreData(username string, carID string, lat float6
 	drowsiness.Time = time
 	drowsiness.WorkingHour = workingHour
 	drowsiness.ResponseTime = responseTime
-	drowsiness.Road = "st. chon"
+	drowsiness.Road = road
 	id, err := ds.crud.Create("drowsiness", &drowsiness)
 
 	if err != nil {

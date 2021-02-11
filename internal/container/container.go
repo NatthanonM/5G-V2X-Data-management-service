@@ -69,6 +69,10 @@ func (cn *Container) Configure() {
 		cn.Error = err
 	}
 
+	if err := cn.container.Provide(services.NewGoogleService); err != nil {
+		cn.Error = err
+	}
+
 	// repositories
 	if err := cn.container.Provide(repositories.NewCRUDRepository); err != nil {
 		cn.Error = err
