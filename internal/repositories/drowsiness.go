@@ -36,7 +36,7 @@ func (dr *DrowsinessRepository) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*
 
 	var results []*models.Drowsiness
 
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
@@ -128,12 +128,12 @@ func (dr *DrowsinessRepository) Find(filter primitive.D) ([]*models.Drowsiness, 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMonth int, startYear int, endDay int, endMonth int, endYear int) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	toHour := time.Date(endYear, time.Month(endMonth), endDay, 23, 59, 99, 99, time.UTC)
+	toHour := time.Date(endYear, time.Month(endMonth), endDay, 0, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -147,7 +147,7 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMo
 }
 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
-	year1, month, day := time.Now().Date()
+	year1, month, day := time.Now().UTC().Date()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	var dayArr [12]int = ar.dayArr
 
@@ -166,11 +166,19 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 		result.Name = monthArr[j]
 		days := make([]int32, dayArr[j])
 		for i := 1; i <= dayArr[j]; i++ {
-			cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, i, j+1, year)
-			if err != nil {
-				log.Fatal(err)
+			if(i==dayArr[j]){
+				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, 1, j+2, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
+			}else{
+				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, i+1, j+1, year)
+				if err != nil {
+					log.Fatal(err)
+				}
+				days[i-1] = cur
 			}
-			days[i-1] = cur
 			if i == day && int(month)-1 == j {
 				break
 			}
@@ -188,12 +196,12 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, year int, hour int32) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
 	fromHour := time.Date(year, time.Month(month), day, int(hour), 0, 0, 0, time.UTC)
-	toHour := time.Date(year, time.Month(month), day, int(hour), 59, 99, 999, time.UTC)
+	toHour := time.Date(year, time.Month(month), day, int(hour)+1, 0, 0, 0, time.UTC)
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromHour},
-				{"$lte", toHour},
+				{"$gte", fromHour},
+				{"$lt", toHour},
 			},
 		},
 	}
@@ -207,26 +215,34 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, ye
 }
 
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
-	year1, month1, day1 := time.Now().Date()
+	year1, month1, day1 := time.Now().UTC().Date()
 	hour := 23
 	var dayArr [12]int = ar.dayArr
 	var mt int = 12
-	var mst int = month
+	var mst int = 1
+	var daySt int = 1
+	if day1 == day && int(month1) == month && year == year1 {
+		hour = time.Now().UTC().Hour()
+		daySt = day
+		dayArr[month-1] = day
+	}
 	days := make([]int32, hour+1)
+
 	for y := year; y < year1+1; y++ {
-		if y == year1 {
-			mt = int(month1)
-			dayArr[mt-1] = day1
-		}
-		if y%400 == 0 || (y%4 == 0 && !(y%100 == 0)) {
+		if (y%400 == 0 || (y%4 == 0 && !(y%100 == 0))) {
 			dayArr[1] = 29
 		} else {
 			dayArr[1] = 28
 		}
+		if y == year1 {
+			mst = month
+			mt = int(month1)
+			dayArr[mt-1] = day1
+		}
 		for m := mst; m <= mt; m++ {
-			for d := 1; d <= dayArr[m-1]; d++ {
+			for d := daySt; d <= dayArr[m-1]; d++ {
 				if day1 == d && int(month1) == m && y == year1 {
-					hour = time.Now().Hour()
+					hour = time.Now().UTC().Hour()
 				}
 				for i := 0; i <= hour; i++ {
 					cur, err := ar.GetNumberOfDrowsinessHour(d, m, y, int32(i))

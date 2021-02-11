@@ -122,7 +122,7 @@ func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context,
 
 // GetNumberOfAccidentToCalendar
 func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentToCalendarResponse, error) {
-	year := time.Now().Year()
+	year := time.Now().UTC().Year()
 	numberOfAccidentCurrentYear, err := ac.AccidentService.GetNumberOfAccidentToCalendar(year)
 	if err != nil {
 		fmt.Println(err)
@@ -148,7 +148,7 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 
 // GetGetNumberOfAccidentCurrentYearDetailDay
 func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentTimeBarResponse, error) {
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 
 	numberOfAccidentTimeBar, err := ac.AccidentService.GetNumberOfAccidentTimeBar(day, int(month), year)
 	if err != nil {
@@ -161,10 +161,10 @@ func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, re
 }
 
 func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentStreetResponse, error) {
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 	var no []int32
 	var label []string
-	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(day, int(month), year, day, int(month), year)
+	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(day, int(month), year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
