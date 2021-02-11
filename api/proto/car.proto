@@ -23,10 +23,10 @@ message RegisterNewCarResponse { string car_id = 1; }
 
 message GetCarListResponse { repeated Car car_list = 1; }
 
-message GetCarResponse { string car_id = 1; }
+message GetCarRequest { string car_id = 1; }
 
 service CarService {
   rpc RegisterNewCar(RegisterNewCarRequest) returns (RegisterNewCarResponse) {}
   rpc GetCarList(google.protobuf.Empty) returns (GetCarListResponse) {}
-  rpc GetCar(GetCarResponse) returns (Car) {}
+  rpc GetCar(GetCarRequest) returns (Car) {}
 }

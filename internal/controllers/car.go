@@ -63,7 +63,7 @@ func (cc *CarController) GetCarList(ctx context.Context, req *empty.Empty) (*pro
 	}, nil
 }
 
-func (cc *CarController) GetCar(ctx context.Context, req *proto.GetCarResponse) (*proto.Car, error) {
+func (cc *CarController) GetCar(ctx context.Context, req *proto.GetCarRequest) (*proto.Car, error) {
 	car, err := cc.CarService.GetCar(req.CarId)
 	if err != nil {
 		return nil, err
