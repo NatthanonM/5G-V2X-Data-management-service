@@ -13,6 +13,11 @@ type Accident struct {
 type AccidentStatCal struct {
 	Name string  `json:"name"`
 	Data []int32 `json:"data"`
+	Username  string
+	CarID     string `bson:"car_id"`
+	Time      time.Time
+	Latitude  float64
+	Longitude float64
 }
 type NumberOfAccidentRoad struct {
 	ID    string `bson:"_id" json:"id"`
