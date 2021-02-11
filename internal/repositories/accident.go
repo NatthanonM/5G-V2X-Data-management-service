@@ -296,7 +296,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		if(elem.ID!=""){
 			m[elem.ID] = elem.Total
 		}else{
-			m["์N/A"] = elem.Total
+			m["N/A"] = elem.Total
 		}
 	}
 
