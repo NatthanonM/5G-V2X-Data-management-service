@@ -84,8 +84,8 @@ func (ds *DrowsinessService) GetDrowsiness(from, to *timestamppb.Timestamp, carI
 	return drowsinessData, nil
 }
 
-func (as *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
-	result, err := as.DrowsinessRepository.GetNumberOfDrowsinessToCalendar(year)
+func (ds *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
+	result, err := ds.DrowsinessRepository.GetNumberOfDrowsinessToCalendar(year)
 
 	if err != nil {
 		return nil, err
@@ -94,11 +94,19 @@ func (as *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int) ([]*model
 	return result, nil
 }
 
-func (as *DrowsinessService) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
-	result, err := as.DrowsinessRepository.GetNumberOfDrowsinessTimeBar(day, month, year)
+func (ds *DrowsinessService) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
+	result, err := ds.DrowsinessRepository.GetNumberOfDrowsinessTimeBar(day, month, year)
 	if err != nil {
 		return nil, err
 	}
 
+	return result, nil
+}
+
+func (ds *DrowsinessService) GetDrowsinessStatGroupByHour(from, to *timestamppb.Timestamp, driverUsername *string) ([24]int32, error) {
+	result, err := ds.DrowsinessRepository.GetDrowsinessStatGroupByHour(from, to, driverUsername)
+	if err != nil {
+		return [24]int32{}, err
+	}
 	return result, nil
 }

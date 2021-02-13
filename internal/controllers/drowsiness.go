@@ -71,9 +71,9 @@ func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *prot
 	}, nil
 }
 
-func (ac *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessToCalendarResponse, error) {
+func (dc *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessToCalendarResponse, error) {
 	year := time.Now().Year()
-	numberOfDrowsinessCurrentYear, err := ac.DrowsinessService.GetNumberOfDrowsinessToCalendar(year)
+	numberOfDrowsinessCurrentYear, err := dc.DrowsinessService.GetNumberOfDrowsinessToCalendar(year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -96,14 +96,28 @@ func (ac *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Cont
 	}, nil
 }
 
-func (ac *DrowsinessController) GetNumberOfDrowsinessTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessTimeBarResponse, error) {
+func (dc *DrowsinessController) GetNumberOfDrowsinessTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessTimeBarResponse, error) {
 	year, month, day := time.Now().Date()
-	numberOfDrowsinessTimeBar, err := ac.DrowsinessService.GetNumberOfDrowsinessTimeBar(day, int(month), year)
+	numberOfDrowsinessTimeBar, err := dc.DrowsinessService.GetNumberOfDrowsinessTimeBar(day, int(month), year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	return &proto.GetNumberOfDrowsinessTimeBarResponse{
 		Drowsinesss: numberOfDrowsinessTimeBar,
+	}, nil
+}
+
+func (dc *DrowsinessController) GetDrowsinessStatGroupByHour(ctx context.Context, req *proto.GetDrowsinessStatGroupByHourRequest) (*proto.GetDrowsinessStatGroupByHourResponse, error) {
+	countEachHour, err := dc.DrowsinessService.GetDrowsinessStatGroupByHour(req.From, req.To, req.DriverUsername)
+	if err != nil {
+		return nil, err
+	}
+	drowsinesses := []int64{}
+	for _, e := range countEachHour {
+		drowsinesses = append(drowsinesses, int64(e))
+	}
+	return &proto.GetDrowsinessStatGroupByHourResponse{
+		Drowsinesses: drowsinesses,
 	}, nil
 }

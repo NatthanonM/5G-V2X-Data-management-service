@@ -37,6 +37,16 @@ message GetNumberOfDrowsinessToCalendarResponse {
 
 message GetNumberOfDrowsinessTimeBarResponse { repeated int32 drowsinesss = 1; }
 
+message GetDrowsinessStatGroupByHourRequest {
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+  optional string driver_username = 3;
+}
+
+message GetDrowsinessStatGroupByHourResponse {
+  repeated int64 drowsinesses = 1;
+}
+
 service DrowsinessService {
   rpc CreateDrowsinessData(DrowsinessData)
       returns (CreateDrowsinessDataResponse) {}
@@ -46,4 +56,6 @@ service DrowsinessService {
       returns (GetNumberOfDrowsinessToCalendarResponse) {}
   rpc GetNumberOfDrowsinessTimeBar(google.protobuf.Empty)
       returns (GetNumberOfDrowsinessTimeBarResponse) {}
+  rpc GetDrowsinessStatGroupByHour(GetDrowsinessStatGroupByHourRequest)
+      returns (GetDrowsinessStatGroupByHourResponse) {}
 }

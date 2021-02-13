@@ -9,6 +9,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
@@ -146,10 +148,10 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMo
 
 }
 
-func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
+func (dr *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
 	year1, month, day := time.Now().Date()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
-	var dayArr [12]int = ar.dayArr
+	var dayArr [12]int = dr.dayArr
 
 	if int(year)%400 == 0 || (int(year)%4 == 0 && !(int(year)%100 == 0)) {
 		dayArr[1] = 29
@@ -166,14 +168,14 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 		result.Name = monthArr[j]
 		days := make([]int32, dayArr[j])
 		for i := 1; i <= dayArr[j]; i++ {
-			if(i==dayArr[j]){
-				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, 1, j+2, year)
+			if i == dayArr[j] {
+				cur, err := dr.GetNumberOfDrowsinessOnDay(i, j+1, year, 1, j+2, year)
 				if err != nil {
 					log.Fatal(err)
 				}
 				days[i-1] = cur
-			}else{
-				cur, err := ar.GetNumberOfDrowsinessOnDay(i, j+1, year, i+1, j+1, year)
+			} else {
+				cur, err := dr.GetNumberOfDrowsinessOnDay(i, j+1, year, i+1, j+1, year)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -193,8 +195,8 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 }
 
 // time
-func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, year int, hour int32) (int32, error) {
-	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
+func (dr *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, year int, hour int32) (int32, error) {
+	collection := dr.MONGO.Client.Database(dr.config.DatabaseName).Collection("drowsiness")
 	fromHour := time.Date(year, time.Month(month), day, int(hour), 0, 0, 0, time.UTC)
 	toHour := time.Date(year, time.Month(month), day, int(hour)+1, 0, 0, 0, time.UTC)
 	filter := bson.D{
@@ -214,10 +216,10 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessHour(day int, month int, ye
 
 }
 
-func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
+func (dr *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
 	year1, month1, day1 := time.Now().Date()
 	hour := 23
-	var dayArr [12]int = ar.dayArr
+	var dayArr [12]int = dr.dayArr
 	var mt int = 12
 	var mst int = 1
 	var daySt int = 1
@@ -229,7 +231,7 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int,
 	days := make([]int32, hour+1)
 
 	for y := year; y < year1+1; y++ {
-		if (y%400 == 0 || (y%4 == 0 && !(y%100 == 0))) {
+		if y%400 == 0 || (y%4 == 0 && !(y%100 == 0)) {
 			dayArr[1] = 29
 		} else {
 			dayArr[1] = 28
@@ -245,7 +247,7 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int,
 					hour = time.Now().Hour()
 				}
 				for i := 0; i <= hour; i++ {
-					cur, err := ar.GetNumberOfDrowsinessHour(d, m, y, int32(i))
+					cur, err := dr.GetNumberOfDrowsinessHour(d, m, y, int32(i))
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -259,4 +261,65 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int,
 	}
 
 	return days, nil
+}
+
+func (dr *DrowsinessRepository) GetDrowsinessStatGroupByHour(from, to *timestamppb.Timestamp, driverUsername *string) ([24]int32, error) {
+	collection := dr.MONGO.Client.Database(dr.config.DatabaseName).Collection("drowsiness")
+	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
+	toTime := time.Now()
+	if from != nil {
+		fromTime = from.AsTime()
+	}
+	if to != nil {
+		toTime = to.AsTime()
+	}
+
+	filter := bson.D{{
+		"time", bson.D{
+			{"$gte", fromTime},
+			{"$lt", toTime},
+		},
+	}}
+	if driverUsername != nil {
+		filter = append(filter, bson.E{
+			"username", *driverUsername,
+		})
+	}
+	matchStage := bson.D{{"$match", filter}}
+
+	projectStage := bson.D{{
+		"$project", bson.M{
+			"h": bson.M{"$hour": "$time"},
+		},
+	}}
+
+	groupStage := bson.D{{"$group", bson.D{
+		{"_id", bson.D{
+			{"hour", "$h"},
+		}},
+		{"total", bson.D{{"$sum", 1}}},
+	}}}
+
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, projectStage, groupStage})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	countEachHour := [24]int32{}
+	for cur.Next(context.TODO()) {
+		var elem models.NumberOfDrowsiness
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		countEachHour[int(elem.ID.Hour)] = elem.Total
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.TODO())
+
+	return countEachHour, nil
 }

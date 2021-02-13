@@ -17,3 +17,10 @@ type DrowsinessStatCal struct {
 	Name string  `json:"name"`
 	Data []int32 `json:"data"`
 }
+type NumberOfDrowsiness struct {
+	ID    NumberOfDrowsinessHourField `bson:"_id" json:"id"`
+	Total int32                       `json:"total"`
+}
+type NumberOfDrowsinessHourField struct {
+	Hour int32 `json:"h"`
+}
