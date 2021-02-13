@@ -312,7 +312,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 	return m, nil
 }
 
-func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.Timestamp) ([24]int32, error) {
+func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.Timestamp, driverUsername *string) ([24]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
 	toTime := time.Now()
@@ -323,12 +323,18 @@ func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.T
 		toTime = to.AsTime()
 	}
 
-	matchStage := bson.D{{"$match", bson.D{{
+	filter := bson.D{{
 		"time", bson.D{
 			{"$gte", fromTime},
 			{"$lt", toTime},
 		},
-	}}}}
+	}}
+	if driverUsername != nil {
+		filter = append(filter, bson.E{
+			"username", *driverUsername,
+		})
+	}
+	matchStage := bson.D{{"$match", filter}}
 
 	projectStage := bson.D{{
 		"$project", bson.M{

@@ -134,8 +134,8 @@ func (as *AccidentService) GetNumberOfAccidentStreet(startDay int, startMonth in
 	return result, nil
 }
 
-func (as *AccidentService) GetAccidentStatGroupByHour(from, to *timestamppb.Timestamp) ([24]int32, error) {
-	result, err := as.AccidentRepository.GetAccidentStatGroupByHour(from, to)
+func (as *AccidentService) GetAccidentStatGroupByHour(from, to *timestamppb.Timestamp, driverUsername *string) ([24]int32, error) {
+	result, err := as.AccidentRepository.GetAccidentStatGroupByHour(from, to, driverUsername)
 	if err != nil {
 		return [24]int32{}, err
 	}

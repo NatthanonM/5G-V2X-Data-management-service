@@ -189,7 +189,7 @@ func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req
 }
 
 func (ac *AccidentController) GetAccidentStatGroupByHour(ctx context.Context, req *proto.GetAccidentStatGroupByHourRequest) (*proto.GetAccidentStatGroupByHourResponse, error) {
-	countEachHour, err := ac.AccidentService.GetAccidentStatGroupByHour(req.From, req.To)
+	countEachHour, err := ac.AccidentService.GetAccidentStatGroupByHour(req.From, req.To, req.DriverUsername)
 	if err != nil {
 		return nil, err
 	}
