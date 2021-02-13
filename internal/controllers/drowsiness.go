@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type DrowsinessController struct {
@@ -49,42 +47,8 @@ func (dc *DrowsinessController) CreateDrowsinessData(ctx context.Context, req *p
 	}, nil
 }
 
-func (dc *DrowsinessController) GetHourlyDrowsinessOfCurrentDay(ctx context.Context, req *proto.GetHourlyDrowsinessOfCurrentDayRequest) (*proto.GetHourlyDrowsinessOfCurrentDayResponse, error) {
-	if req.Hour < 0 || req.Hour > 23 {
-		err := status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
-		fmt.Println(err)
-		return nil, err
-	}
-
-	hourlyDrowsinessOfCurrentDay, err := dc.DrowsinessService.GetHourlyDrowsinessOfCurrentDay(req.Hour)
-
-	var drosinessList []*proto.DrowsinessData
-	for _, elem := range hourlyDrowsinessOfCurrentDay {
-		drosinessList = append(drosinessList, &proto.DrowsinessData{
-			Username:     elem.Username,
-			CarId:        elem.CarID,
-			Latitude:     elem.Latitude,
-			Longitude:    elem.Longitude,
-			Time:         utils.WrapperTime(&elem.Time),
-			ResponseTime: elem.ResponseTime,
-			WorkingHour:  elem.WorkingHour,
-		})
-	}
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return &proto.GetHourlyDrowsinessOfCurrentDayResponse{
-		Drowsinesses: drosinessList,
-	}, nil
-}
-
 func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *proto.GetDrowsinessDataRequest) (*proto.GetDrowsinessDataResponse, error) {
-	if req.CarId == nil && req.Username == nil {
-		err := status.Error(codes.InvalidArgument, "Car id or username must be provided")
-		return nil, err
-	}
-	drowsinessData, err := dc.DrowsinessService.GetDrowsiness(req.CarId, req.Username)
+	drowsinessData, err := dc.DrowsinessService.GetDrowsiness(req.From, req.To, req.CarId, req.Username)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

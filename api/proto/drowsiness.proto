@@ -22,15 +22,11 @@ message DrowsinessStatCalData {
 
 message CreateDrowsinessDataResponse { string drowsiness_id = 1; }
 
-message GetHourlyDrowsinessOfCurrentDayRequest { int32 hour = 1; }
-
-message GetHourlyDrowsinessOfCurrentDayResponse {
-  repeated DrowsinessData drowsinesses = 1;
-}
-
 message GetDrowsinessDataRequest {
-  optional string car_id = 1;
-  optional string username = 2;
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+  optional string car_id = 3;
+  optional string username = 4;
 }
 
 message GetDrowsinessDataResponse { repeated DrowsinessData drowsinesses = 1; }
@@ -44,8 +40,6 @@ message GetNumberOfDrowsinessTimeBarResponse { repeated int32 drowsinesss = 1; }
 service DrowsinessService {
   rpc CreateDrowsinessData(DrowsinessData)
       returns (CreateDrowsinessDataResponse) {}
-  rpc GetHourlyDrowsinessOfCurrentDay(GetHourlyDrowsinessOfCurrentDayRequest)
-      returns (GetHourlyDrowsinessOfCurrentDayResponse) {}
   rpc GetDrowsinessData(GetDrowsinessDataRequest)
       returns (GetDrowsinessDataResponse) {}
   rpc GetNumberOfDrowsinessToCalendar(google.protobuf.Empty)

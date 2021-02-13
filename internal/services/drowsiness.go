@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type DrowsinessService struct {
@@ -47,8 +48,25 @@ func (ds *DrowsinessService) GetHourlyDrowsinessOfCurrentDay(hour int32) ([]*mod
 	return result, nil
 }
 
-func (ds *DrowsinessService) GetDrowsiness(carID, username *string) ([]*models.Drowsiness, error) {
-	filter := bson.D{{}}
+func (ds *DrowsinessService) GetDrowsiness(from, to *timestamppb.Timestamp, carID, username *string) ([]*models.Drowsiness, error) {
+	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
+	toTime := time.Now()
+	if from != nil {
+		fromTime = from.AsTime()
+	}
+	if to != nil {
+		toTime = to.AsTime()
+	}
+
+	filter := bson.D{
+		{
+			"time", bson.D{
+				{"$gte", fromTime},
+				{"$lt", toTime},
+			},
+		},
+	}
+
 	if carID != nil {
 		filter = append(filter, bson.E{
 			"car_id", *carID,
