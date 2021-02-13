@@ -50,6 +50,13 @@ message GetNumberOfAccidentTimeBarResponse { repeated int32 accidents = 1; }
 
 message GetNumberOfAccidentStreetResponse { AccidentStatPieData accidents = 1; }
 
+message GetAccidentStatGroupByHourRequest {
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+}
+
+message GetAccidentStatGroupByHourResponse { repeated int64 accidents = 1; }
+
 service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
   rpc GetAllAccidentData(google.protobuf.Empty)
@@ -62,4 +69,6 @@ service AccidentService {
       returns (GetNumberOfAccidentTimeBarResponse) {}
   rpc GetNumberOfAccidentStreet(google.protobuf.Empty)
       returns (GetNumberOfAccidentStreetResponse) {}
+  rpc GetAccidentStatGroupByHour(GetAccidentStatGroupByHourRequest)
+      returns (GetAccidentStatGroupByHourResponse) {}
 }

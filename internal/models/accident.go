@@ -11,8 +11,8 @@ type Accident struct {
 	Road      string    `bson:"road"`
 }
 type AccidentStatCal struct {
-	Name string  `json:"name"`
-	Data []int32 `json:"data"`
+	Name      string  `json:"name"`
+	Data      []int32 `json:"data"`
 	Username  string
 	CarID     string `bson:"car_id"`
 	Time      time.Time
@@ -21,5 +21,12 @@ type AccidentStatCal struct {
 }
 type NumberOfAccidentRoad struct {
 	ID    string `bson:"_id" json:"id"`
-	Total int32 `json:"total"`
+	Total int32  `json:"total"`
+}
+type NumberOfAccident struct {
+	ID    NumberOfAccidentHourField `bson:"_id" json:"id"`
+	Total int32                     `json:"total"`
+}
+type NumberOfAccidentHourField struct {
+	Hour int32 `json:"h"`
 }

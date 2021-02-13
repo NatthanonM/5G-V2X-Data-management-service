@@ -152,7 +152,7 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 	}, nil
 }
 
-// GetGetNumberOfAccidentCurrentYearDetailDay
+// GetNumberOfAccidentTimeBar
 func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentTimeBarResponse, error) {
 	year, month, day := time.Now().Date()
 
@@ -185,5 +185,19 @@ func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req
 	}
 	return &proto.GetNumberOfAccidentStreetResponse{
 		Accidents: anAccident,
+	}, nil
+}
+
+func (ac *AccidentController) GetAccidentStatGroupByHour(ctx context.Context, req *proto.GetAccidentStatGroupByHourRequest) (*proto.GetAccidentStatGroupByHourResponse, error) {
+	countEachHour, err := ac.AccidentService.GetAccidentStatGroupByHour(req.From, req.To)
+	if err != nil {
+		return nil, err
+	}
+	accidents := []int64{}
+	for _, e := range countEachHour {
+		accidents = append(accidents, int64(e))
+	}
+	return &proto.GetAccidentStatGroupByHourResponse{
+		Accidents: accidents,
 	}, nil
 }

@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"5g-v2x-data-management-service/internal/config"
 	"5g-v2x-data-management-service/internal/infrastructures/database"
@@ -309,4 +310,59 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 	fmt.Println(m)
 
 	return m, nil
+}
+
+func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.Timestamp) ([24]int32, error) {
+	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
+	toTime := time.Now()
+	if from != nil {
+		fromTime = from.AsTime()
+	}
+	if to != nil {
+		toTime = to.AsTime()
+	}
+
+	matchStage := bson.D{{"$match", bson.D{{
+		"time", bson.D{
+			{"$gte", fromTime},
+			{"$lt", toTime},
+		},
+	}}}}
+
+	projectStage := bson.D{{
+		"$project", bson.M{
+			"h": bson.M{"$hour": "$time"},
+		},
+	}}
+
+	groupStage := bson.D{{"$group", bson.D{
+		{"_id", bson.D{
+			{"hour", "$h"},
+		}},
+		{"total", bson.D{{"$sum", 1}}},
+	}}}
+
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, projectStage, groupStage})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	countEachHour := [24]int32{}
+	for cur.Next(context.TODO()) {
+		var elem models.NumberOfAccident
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		countEachHour[int(elem.ID.Hour)] = elem.Total
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.TODO())
+
+	return countEachHour, nil
 }
