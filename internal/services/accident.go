@@ -62,8 +62,8 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, us
 	filter := bson.D{
 		{
 			"time", bson.D{
-				{"$gt", fromTime},
-				{"$lte", toTime},
+				{"$gte", fromTime},
+				{"$lt", toTime},
 			},
 		},
 	}
@@ -95,15 +95,15 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, us
 	return result, nil
 }
 
-func (as *AccidentService) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.Accident, error) {
+// func (as *AccidentService) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.Accident, error) {
 
-	result, err := as.AccidentRepository.GetHourlyAccidentOfCurrentDay(hour)
+// 	result, err := as.AccidentRepository.GetHourlyAccidentOfCurrentDay(hour)
 
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return result, nil
+// }
 
 func (as *AccidentService) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
 	result, err := as.AccidentRepository.GetNumberOfAccidentToCalendar(year)

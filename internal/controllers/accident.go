@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type AccidentController struct {
@@ -98,35 +96,35 @@ func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.Ge
 }
 
 // GetHourlyAccidentOfCurrentDay ...
-func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context, req *proto.GetHourlyAccidentOfCurrentDayRequest) (*proto.GetHourlyAccidentOfCurrentDayResponse, error) {
-	if req.Hour < 0 || req.Hour > 23 {
-		err := status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
-		fmt.Println(err)
-		return nil, err
-	}
+// func (ac *AccidentController) GetHourlyAccidentOfCurrentDay(ctx context.Context, req *proto.GetHourlyAccidentOfCurrentDayRequest) (*proto.GetHourlyAccidentOfCurrentDayResponse, error) {
+// 	if req.Hour < 0 || req.Hour > 23 {
+// 		err := status.Error(codes.InvalidArgument, "Hour must be between 0 to 23")
+// 		fmt.Println(err)
+// 		return nil, err
+// 	}
 
-	hourlyAccidentOfCurrentDay, err := ac.AccidentService.GetHourlyAccidentOfCurrentDay(req.Hour)
+// 	hourlyAccidentOfCurrentDay, err := ac.AccidentService.GetHourlyAccidentOfCurrentDay(req.Hour)
 
-	var accidentList []*proto.AccidentData
-	for _, elem := range hourlyAccidentOfCurrentDay {
-		anAccident := proto.AccidentData{
-			Username:  elem.Username,
-			CarId:     elem.CarID,
-			Latitude:  elem.Latitude,
-			Longitude: elem.Longitude,
-			Time:      utils.WrapperTime(&elem.Time),
-			Road:      elem.Road,
-		}
-		accidentList = append(accidentList, &anAccident)
-	}
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return &proto.GetHourlyAccidentOfCurrentDayResponse{
-		Accidents: accidentList,
-	}, nil
-}
+// 	var accidentList []*proto.AccidentData
+// 	for _, elem := range hourlyAccidentOfCurrentDay {
+// 		anAccident := proto.AccidentData{
+// 			Username:  elem.Username,
+// 			CarId:     elem.CarID,
+// 			Latitude:  elem.Latitude,
+// 			Longitude: elem.Longitude,
+// 			Time:      utils.WrapperTime(&elem.Time),
+// 			Road:      elem.Road,
+// 		}
+// 		accidentList = append(accidentList, &anAccident)
+// 	}
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return nil, err
+// 	}
+// 	return &proto.GetHourlyAccidentOfCurrentDayResponse{
+// 		Accidents: accidentList,
+// 	}, nil
+// }
 
 // GetNumberOfAccidentToCalendar
 func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentToCalendarResponse, error) {

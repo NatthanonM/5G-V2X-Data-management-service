@@ -3,9 +3,10 @@ package repositories
 import (
 	"5g-v2x-data-management-service/internal/models"
 	"context"
+	"fmt"
 	"log"
 	"time"
-	"fmt"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -89,46 +90,46 @@ func (ar *AccidentRepository) Find(filter primitive.D) ([]*models.Accident, erro
 }
 
 // GetHourlyAccidentOfCurrentDay ...
-func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.Accident, error) {
-	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+// func (ar *AccidentRepository) GetHourlyAccidentOfCurrentDay(hour int32) ([]*models.Accident, error) {
+// 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 
-	var results []*models.Accident
+// 	var results []*models.Accident
 
-	year, month, day := time.Now().Date()
-	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
-	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
+// 	year, month, day := time.Now().Date()
+// 	fromHour := time.Date(year, month, day, int(hour), 0, 0, 0, time.UTC)
+// 	toHour := time.Date(year, month, day, int(hour+1), 0, 0, 0, time.UTC)
 
-	filter := bson.D{
-		{
-			"time", bson.D{
-				{"$gte", fromHour},
-				{"$lt", toHour},
-			},
-		},
-	}
+// 	filter := bson.D{
+// 		{
+// 			"time", bson.D{
+// 				{"$gte", fromHour},
+// 				{"$lt", toHour},
+// 			},
+// 		},
+// 	}
 
-	cur, err := collection.Find(context.TODO(), filter)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	cur, err := collection.Find(context.TODO(), filter)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	for cur.Next(context.TODO()) {
-		var elem models.Accident
-		err := cur.Decode(&elem)
-		if err != nil {
-			log.Fatal(err)
-		}
-		results = append(results, &elem)
-	}
+// 	for cur.Next(context.TODO()) {
+// 		var elem models.Accident
+// 		err := cur.Decode(&elem)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		results = append(results, &elem)
+// 	}
 
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
+// 	if err := cur.Err(); err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	cur.Close(context.TODO())
+// 	cur.Close(context.TODO())
 
-	return results, nil
-}
+// 	return results, nil
+// }
 
 func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year int, hour int32) (int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
@@ -167,7 +168,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, yea
 
 	for y := year; y < year1+1; y++ {
 		fmt.Println(y)
-		if (y%400 == 0 || (y%4 == 0 && !(y%100 == 0))) {
+		if y%400 == 0 || (y%4 == 0 && !(y%100 == 0)) {
 			dayArr[1] = 29
 		} else {
 			dayArr[1] = 28
@@ -240,20 +241,20 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 		result.Name = monthArr[j]
 		days := make([]int32, dayArr[j])
 		for i := 1; i <= dayArr[j]; i++ {
-			if(i==dayArr[j]){
+			if i == dayArr[j] {
 				cur, err := ar.GetNumberOfAccidentDay(i, j+1, year, 1, j+2, year)
 				if err != nil {
 					log.Fatal(err)
 				}
 				days[i-1] = cur
-			}else{
+			} else {
 				cur, err := ar.GetNumberOfAccidentDay(i, j+1, year, i+1, j+1, year)
 				if err != nil {
 					log.Fatal(err)
 				}
 				days[i-1] = cur
 			}
-			
+
 			if i == day && int(month)-1 == j {
 				break
 			}
@@ -279,11 +280,11 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 	matchStage := bson.D{{"$match", bson.D{{
 		"time", bson.D{
 			{"$gte", fromHour},
-			{"$lte", toHour},
+			{"$lt", toHour},
 		},
 	}}}}
 
-	cur, err := collection.Aggregate(context.TODO(),mongo.Pipeline{matchStage, groupStage})
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -293,9 +294,9 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		if err != nil {
 			log.Fatal(err)
 		}
-		if(elem.ID!=""){
+		if elem.ID != "" {
 			m[elem.ID] = elem.Total
-		}else{
+		} else {
 			m["N/A"] = elem.Total
 		}
 	}
@@ -307,5 +308,5 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 	cur.Close(context.TODO())
 	fmt.Println(m)
 
-	return m ,nil
+	return m, nil
 }

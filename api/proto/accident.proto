@@ -56,8 +56,6 @@ service AccidentService {
       returns (GetAllAccidentDataResponse) {}
   rpc GetAccidentData(GetAccidentDataRequest)
       returns (GetAccidentDataResponse) {}
-  rpc GetHourlyAccidentOfCurrentDay(GetHourlyAccidentOfCurrentDayRequest)
-      returns (GetHourlyAccidentOfCurrentDayResponse) {}
   rpc GetNumberOfAccidentToCalendar(google.protobuf.Empty)
       returns (GetNumberOfAccidentToCalendarResponse) {}
   rpc GetNumberOfAccidentTimeBar(google.protobuf.Empty)
