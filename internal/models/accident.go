@@ -30,3 +30,10 @@ type NumberOfAccident struct {
 type NumberOfAccidentHourField struct {
 	Hour int32 `json:"h"`
 }
+type NumberOfAccidentDate struct {
+	ID    NumberOfAccidentDateField `bson:"_id" json:"id"`
+	Total int32                     `json:"total"`
+}
+type NumberOfAccidentDateField struct {
+    Date  string `bson:"date" json:"date"`
+}

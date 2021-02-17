@@ -24,3 +24,10 @@ type NumberOfDrowsiness struct {
 type NumberOfDrowsinessHourField struct {
 	Hour int32 `json:"h"`
 }
+type NumberOfDrowsinessDate struct {
+	ID    NumberOfDrowsinessDateField `bson:"_id" json:"id"`
+	Total int32                     `json:"total"`
+}
+type NumberOfDrowsinessDateField struct {
+    Date  string `bson:"date" json:"date"`
+}
