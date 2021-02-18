@@ -151,14 +151,14 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessOnDay(startDay int, startMo
 func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(day int, month int, year int) ([]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
 	t := time.Now()
-	h := t.Hour()+1
-	if(t.Year() != year ||int(t.Month()) != month||t.Day() != day){
+	h := t.Hour() + 1
+	if t.Year() != year || int(t.Month()) != month || t.Day() != day {
 		h = 24
 	}
 	thTimeZone, _ := time.LoadLocation("Asia/Bangkok")
-	fromTime := time.Date(year,time.Month(month), day, 0, 0, 0, 0, thTimeZone).UTC()
-	toTime := time.Date(t.Year(), t.Month(), t.Day(),t.Hour(), 59, 59, 999, thTimeZone).UTC()
-	
+	fromTime := time.Date(year, time.Month(month), day, 0, 0, 0, 0, thTimeZone).UTC()
+	toTime := time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), 59, 59, 999, thTimeZone).UTC()
+
 	filter := bson.D{{
 		"time", bson.D{
 			{"$gte", fromTime},
@@ -222,8 +222,8 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("drowsiness")
 	t := time.Now()
 	thTimeZone, _ := time.LoadLocation("Asia/Bangkok")
-	fromTime := time.Date(year,time.Month(0), 1, 0, 0, 0, 0, thTimeZone).UTC()
-	toTime := time.Date(t.Year(), t.Month(), t.Day(),23, 59, 59, 999, thTimeZone).UTC()
+	fromTime := time.Date(year, time.Month(0), 1, 0, 0, 0, 0, thTimeZone).UTC()
+	toTime := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 999, thTimeZone).UTC()
 	year1 := toTime.Year()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	var dayArr [12]int = ar.dayArr
@@ -244,37 +244,37 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessToCalendar(year int) ([]*mo
 		result.Data = make([]int32, dayArr[j])
 		results = append(results, &result)
 	}
-	
-	var layoutISO string= "2006-01-02"
+
+	var layoutISO string = "2006-01-02"
 	filter := bson.D{{
 		"time", bson.D{
 			{"$gte", fromTime},
 			{"$lt", toTime},
 		},
 	}}
-	
+
 	matchStage := bson.D{{"$match", filter}}
 
 	projectStage := bson.D{{
 		"$project", bson.M{
 			"d": bson.M{
-				"$dateToString": bson.M{"format": "%Y-%m-%d", "date": "$time",    "timezone": "Asia/Bangkok",},
+				"$dateToString": bson.M{"format": "%Y-%m-%d", "date": "$time", "timezone": "Asia/Bangkok"},
 			},
 		},
 	}}
 
 	groupStage := bson.D{{"$group", bson.D{
 		{"_id", bson.D{
-			{"date", "$d"},		
+			{"date", "$d"},
 		}},
 		{"total", bson.D{{"$sum", 1}}},
 	}}}
-	
-	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage,projectStage,groupStage})
+
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, projectStage, groupStage})
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	for cur.Next(context.TODO()) {
 		var elem models.NumberOfDrowsinessDate
 		err := cur.Decode(&elem)
@@ -320,7 +320,7 @@ func (dr *DrowsinessRepository) GetDrowsinessStatGroupByHour(from, to *timestamp
 
 	projectStage := bson.D{{
 		"$project", bson.M{
-			"h": bson.M{"$hour": "$time"},
+			"h": bson.M{"$hour": bson.D{{"date", "$time"}, {"timezone", "Asia/Bangkok"}}},
 		},
 	}}
 
@@ -343,7 +343,7 @@ func (dr *DrowsinessRepository) GetDrowsinessStatGroupByHour(from, to *timestamp
 		if err != nil {
 			log.Fatal(err)
 		}
-		countEachHour[int(elem.ID.Hour)] = elem.Total
+		countEachHour[int(elem.ID.Hour)-1] = elem.Total
 	}
 
 	if err := cur.Err(); err != nil {
