@@ -47,7 +47,7 @@ func (gs *GoogleService) ReverseGeocoding(lat, lng float64) (*string, error) {
 		log.Println(err)
 		return nil, err
 	}
-	roadName := ""
+	roadName := "Unnamed Road"
 	if len(reverseGeocode.Results) != 0 {
 		roadName = reverseGeocode.Results[0].AddressComponents[0].LongName
 	}
