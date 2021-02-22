@@ -7,5 +7,5 @@ type Car struct {
 	VehicleRegistrationNumber string    `bson:"vehicle_registration_number"`
 	CarDetail                 string    `bson:"car_detail"`
 	RegisteredAt              time.Time `bson:"registered_at"`
-	CreatedAt                 time.Time `bson:"created_at"`
+	MfgAt                     time.Time `bson:"mfg_at"`
 }
