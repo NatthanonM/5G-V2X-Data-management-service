@@ -256,15 +256,20 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 	return results, nil
 }
 
-func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int) (map[string]int32, error) {
+func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth int, startYear int) ([]*models.NumberOfAccidentRoad, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 	year, month, day := time.Now().Date()
 	thTimeZone, _ := time.LoadLocation("Asia/Bangkok")
 	fromHour := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, thTimeZone).UTC()
 	toHour := time.Date(year, month, day, 23, 59, 99, 999, thTimeZone).UTC()
-	m := make(map[string]int32)
+	var m []*models.NumberOfAccidentRoad
 
-	groupStage := bson.D{{"$group", bson.D{{"_id", "$road"}, {"total", bson.D{{"$sum", 1}}}}}}
+	groupStage := bson.D{
+		{"$group", bson.D{{"_id", "$road"}, {"total", bson.D{{"$sum", 1}}}}},
+	}
+	sortStage := bson.D{
+		{"$sort", bson.D{{"total", -1}}},
+	}
 
 	matchStage := bson.D{{"$match", bson.D{{
 		"time", bson.D{
@@ -273,7 +278,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		},
 	}}}}
 
-	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage})
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage,sortStage})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -283,11 +288,9 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		if err != nil {
 			log.Fatal(err)
 		}
-		if elem.ID != "" {
-			m[elem.ID] = elem.Total
-		} else {
-			m["N/A"] = elem.Total
-		}
+		
+		m = append(m, &elem)
+		// m["N/A"] = elem.Total
 	}
 
 	if err := cur.Err(); err != nil {

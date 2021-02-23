@@ -175,9 +175,13 @@ func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req
 		fmt.Println(err)
 		return nil, err
 	}
-	for k, v := range acStreet {
-		label = append(label, string(k))
-		no = append(no, int32(v))
+	for _, elem  := range acStreet {
+		if(elem.ID == ""){
+			label = append(label, "N/A")
+		}else{
+			label = append(label, elem.ID)
+		}
+		no = append(no, elem.Total)
 	}
 	anAccident := &proto.AccidentStatPieData{
 		Series: no,
