@@ -343,7 +343,7 @@ func (dr *DrowsinessRepository) GetDrowsinessStatGroupByHour(from, to *timestamp
 		if err != nil {
 			log.Fatal(err)
 		}
-		countEachHour[int(elem.ID.Hour)-1] = elem.Total
+		countEachHour[int(elem.ID.Hour)%24] = elem.Total
 	}
 
 	if err := cur.Err(); err != nil {
