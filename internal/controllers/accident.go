@@ -169,7 +169,7 @@ func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, re
 }
 
 func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentStreetResponse, error) {
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 	var no []int32
 	var label []string
 	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(day, int(month), year)
