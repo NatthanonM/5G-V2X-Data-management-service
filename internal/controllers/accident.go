@@ -24,10 +24,12 @@ func NewAccidentController(accidentSrvc *services.AccidentService, googleSrvc *s
 }
 
 func (ac *AccidentController) CreateAccidentData(ctx context.Context, req *proto.AccidentData) (*proto.CreateAccidentDataResponse, error) {
+	fmt.Println(req)
 	road, err := ac.GoogleService.ReverseGeocoding(req.Latitude, req.Longitude)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(*road)
 
 	accidentID, err := ac.AccidentService.StoreData(
 		req.Username,
@@ -167,18 +169,18 @@ func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, re
 }
 
 func (ac *AccidentController) GetNumberOfAccidentStreet(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentStreetResponse, error) {
-	// year, month, day := time.Now().Date()
+	year, _, _ := time.Now().Date()
 	var no []int32
 	var label []string
-	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(1, 0, 1970)
+	acStreet, err := ac.AccidentService.GetNumberOfAccidentStreet(1, 0, year)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	for _, elem  := range acStreet {
-		if(elem.ID == ""){
+	for _, elem := range acStreet {
+		if elem.ID == "" {
 			label = append(label, "N/A")
-		}else{
+		} else {
 			label = append(label, elem.ID)
 		}
 		no = append(no, elem.Total)

@@ -37,10 +37,10 @@ func (gs *GoogleService) ReverseGeocoding(lat, lng float64) (*string, error) {
 		return nil, status.Error(codes.Internal, "Internal error.")
 	}
 
-	fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Status:", resp.Status)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:")
-	fmt.Println(string(body))
+	// fmt.Println("response Body:")
+	// fmt.Println(string(body))
 
 	var reverseGeocode models.ReverseGeocode
 	if err := json.Unmarshal(body, &reverseGeocode); err != nil {
