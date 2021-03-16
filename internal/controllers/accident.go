@@ -207,3 +207,20 @@ func (ac *AccidentController) GetAccidentStatGroupByHour(ctx context.Context, re
 		Accidents: accidents,
 	}, nil
 }
+
+func (ac *AccidentController) GetTopNRoad(ctx context.Context, req *proto.GetTopNRoadRequest) (*proto.GetTopNRoadResponse, error) {
+	topNRoadResult, err := ac.AccidentService.FindTopNRoad(req.From, req.To)
+	if err != nil {
+		return nil, err
+	}
+	var topNRoad []*proto.TopNRoad
+	for _, v := range topNRoadResult {
+		topNRoad = append(topNRoad, &proto.TopNRoad{
+			RoadName:      v.RoadName,
+			AccidentCount: v.AccidentCount,
+		})
+	}
+	return &proto.GetTopNRoadResponse{
+		TopNRoad: topNRoad,
+	}, nil
+}

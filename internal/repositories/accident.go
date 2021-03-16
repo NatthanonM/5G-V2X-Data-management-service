@@ -278,7 +278,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		},
 	}}}}
 
-	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage,sortStage})
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage, sortStage})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -288,7 +288,7 @@ func (ar *AccidentRepository) GetNumberOfAccidentStreet(startDay int, startMonth
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		m = append(m, &elem)
 		// m["N/A"] = elem.Total
 	}
@@ -362,4 +362,65 @@ func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.T
 	cur.Close(context.TODO())
 
 	return countEachHour, nil
+}
+
+func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp) ([]*models.TopNRoad, error) {
+	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
+	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
+	toTime := time.Now()
+	if from != nil {
+		fromTime = from.AsTime()
+	}
+	if to != nil {
+		toTime = to.AsTime()
+	}
+
+	filter := bson.D{{
+		"time", bson.D{
+			{"$gte", fromTime},
+			{"$lt", toTime},
+		},
+	}}
+
+	matchStage := bson.D{{"$match", filter}}
+
+	groupStage := bson.D{
+		{"$group", bson.M{
+			"_id":   "$road",
+			"count": bson.M{"$sum": 1},
+		}},
+	}
+
+	sortStage := bson.D{
+		{"$sort", bson.D{{"count", -1}}},
+	}
+
+	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage, sortStage})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	topNRoad := []*models.TopNRoad{}
+	i := 0
+	n := 10
+	for cur.Next(context.TODO()) {
+		var elem models.TopNRoad
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		topNRoad = append(topNRoad, &elem)
+		i++
+		if i >= n {
+			break
+		}
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.TODO())
+
+	return topNRoad, nil
 }

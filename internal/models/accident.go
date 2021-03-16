@@ -35,5 +35,9 @@ type NumberOfAccidentDate struct {
 	Total int32                     `json:"total"`
 }
 type NumberOfAccidentDateField struct {
-    Date  string `bson:"date" json:"date"`
+	Date string `bson:"date" json:"date"`
+}
+type TopNRoad struct {
+	RoadName      string `bson:"_id"`
+	AccidentCount int64  `bson:"count"`
 }

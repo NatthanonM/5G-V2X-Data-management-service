@@ -58,6 +58,19 @@ message GetAccidentStatGroupByHourRequest {
 
 message GetAccidentStatGroupByHourResponse { repeated int64 accidents = 1; }
 
+message GetTopNRoadRequest {
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+  optional int32 n = 3;
+}
+
+message TopNRoad {
+  string road_name = 1;
+  int64 accident_count = 2;
+}
+
+message GetTopNRoadResponse { repeated TopNRoad top_n_road = 1; }
+
 service AccidentService {
   rpc CreateAccidentData(AccidentData) returns (CreateAccidentDataResponse) {}
   rpc GetAllAccidentData(google.protobuf.Empty)
@@ -72,4 +85,5 @@ service AccidentService {
       returns (GetNumberOfAccidentStreetResponse) {}
   rpc GetAccidentStatGroupByHour(GetAccidentStatGroupByHourRequest)
       returns (GetAccidentStatGroupByHourResponse) {}
+  rpc GetTopNRoad(GetTopNRoadRequest) returns (GetTopNRoadResponse) {}
 }

@@ -141,3 +141,11 @@ func (as *AccidentService) GetAccidentStatGroupByHour(from, to *timestamppb.Time
 	}
 	return result, nil
 }
+
+func (as *AccidentService) FindTopNRoad(from, to *timestamppb.Timestamp) ([]*models.TopNRoad, error) {
+	result, err := as.AccidentRepository.FindTopNRoad(from, to)
+	if err != nil {
+		return []*models.TopNRoad{}, nil
+	}
+	return result, nil
+}
