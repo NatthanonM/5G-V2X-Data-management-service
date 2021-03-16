@@ -364,7 +364,7 @@ func (ar *AccidentRepository) GetAccidentStatGroupByHour(from, to *timestamppb.T
 	return countEachHour, nil
 }
 
-func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp) ([]*models.TopNRoad, error) {
+func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp, nIn *int64) ([]*models.TopNRoad, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 	fromTime := time.Date(1970, time.Month(0), 0, 0, 0, 0, 0, time.UTC)
 	toTime := time.Now()
@@ -401,8 +401,13 @@ func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp) ([]*
 	}
 
 	topNRoad := []*models.TopNRoad{}
-	i := 0
-	n := 10
+	var i, n int64
+	i = 0
+	if nIn == nil {
+		n = 10
+	} else {
+		n = *nIn
+	}
 	for cur.Next(context.TODO()) {
 		var elem models.TopNRoad
 		err := cur.Decode(&elem)

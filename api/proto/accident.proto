@@ -61,7 +61,7 @@ message GetAccidentStatGroupByHourResponse { repeated int64 accidents = 1; }
 message GetTopNRoadRequest {
   optional google.protobuf.Timestamp from = 1;
   optional google.protobuf.Timestamp to = 2;
-  optional int32 n = 3;
+  optional int64 n = 3;
 }
 
 message TopNRoad {

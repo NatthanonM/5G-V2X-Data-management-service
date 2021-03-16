@@ -209,7 +209,10 @@ func (ac *AccidentController) GetAccidentStatGroupByHour(ctx context.Context, re
 }
 
 func (ac *AccidentController) GetTopNRoad(ctx context.Context, req *proto.GetTopNRoadRequest) (*proto.GetTopNRoadResponse, error) {
-	topNRoadResult, err := ac.AccidentService.FindTopNRoad(req.From, req.To)
+	topNRoadResult, err := ac.AccidentService.FindTopNRoad(req.From, req.To, req.N)
+	// fmt.Println(req.From)
+	// fmt.Println(req.To)
+	// fmt.Println(*req.N)
 	if err != nil {
 		return nil, err
 	}
