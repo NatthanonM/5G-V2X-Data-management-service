@@ -180,11 +180,11 @@ func (ar *AccidentRepository) GetNumberOfAccidentDay(startDay int, startMonth in
 
 }
 
-func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
+func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int64) ([]*models.AccidentStatCal, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 	t := time.Now()
 	thTimeZone, _ := time.LoadLocation("Asia/Bangkok")
-	fromTime := time.Date(year, time.Month(0), 1, 0, 0, 0, 0, thTimeZone).UTC()
+	fromTime := time.Date(int(year), time.Month(0), 1, 0, 0, 0, 0, thTimeZone).UTC()
 	toTime := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 999, thTimeZone).UTC()
 	year1 := toTime.Year()
 	monthArr := [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
@@ -193,9 +193,9 @@ func (ar *AccidentRepository) GetNumberOfAccidentToCalendar(year int) ([]*models
 		dayArr[1] = 29
 	}
 	var m int = int(t.Month())
-	if !(year == year1) {
+	if !(int(year) == year1) {
 		m = 12
-		toTime = time.Date(year, time.Month(11), 31, 23, 59, 99, 999, thTimeZone).UTC()
+		toTime = time.Date(int(year), time.Month(11), 31, 23, 59, 99, 999, thTimeZone).UTC()
 	} else {
 		dayArr[m-1] = t.Day()
 	}

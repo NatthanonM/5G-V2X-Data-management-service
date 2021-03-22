@@ -129,8 +129,13 @@ func (ac *AccidentController) GetAccidentData(ctx context.Context, req *proto.Ge
 // }
 
 // GetNumberOfAccidentToCalendar
-func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentToCalendarResponse, error) {
-	year := time.Now().Year()
+func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context, req *proto.GetNumberOfAccidentToCalendarRequest) (*proto.GetNumberOfAccidentToCalendarResponse, error) {
+	var year int64
+	if req.Year == nil {
+		year = int64(time.Now().UTC().Year())
+	} else {
+		year = *req.Year
+	}
 	numberOfAccidentCurrentYear, err := ac.AccidentService.GetNumberOfAccidentToCalendar(year)
 	if err != nil {
 		fmt.Println(err)

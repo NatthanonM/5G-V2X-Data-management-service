@@ -105,7 +105,7 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, us
 // 	return result, nil
 // }
 
-func (as *AccidentService) GetNumberOfAccidentToCalendar(year int) ([]*models.AccidentStatCal, error) {
+func (as *AccidentService) GetNumberOfAccidentToCalendar(year int64) ([]*models.AccidentStatCal, error) {
 	result, err := as.AccidentRepository.GetNumberOfAccidentToCalendar(year)
 
 	if err != nil {

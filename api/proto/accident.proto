@@ -42,6 +42,8 @@ message GetHourlyAccidentOfCurrentDayResponse {
   repeated AccidentData accidents = 1;
 }
 
+message GetNumberOfAccidentToCalendarRequest { optional int64 year = 1; }
+
 message GetNumberOfAccidentToCalendarResponse {
   repeated AccidentStatCalData accidents = 1;
 }
@@ -77,7 +79,7 @@ service AccidentService {
       returns (GetAllAccidentDataResponse) {}
   rpc GetAccidentData(GetAccidentDataRequest)
       returns (GetAccidentDataResponse) {}
-  rpc GetNumberOfAccidentToCalendar(google.protobuf.Empty)
+  rpc GetNumberOfAccidentToCalendar(GetNumberOfAccidentToCalendarRequest)
       returns (GetNumberOfAccidentToCalendarResponse) {}
   rpc GetNumberOfAccidentTimeBar(google.protobuf.Empty)
       returns (GetNumberOfAccidentTimeBarResponse) {}
