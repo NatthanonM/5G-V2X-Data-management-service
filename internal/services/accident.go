@@ -3,7 +3,6 @@ package services
 import (
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/repositories"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -80,14 +79,10 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, us
 		})
 	}
 
-	fmt.Println(fromTime, "-", toTime)
-	fmt.Println(filter)
+	// fmt.Println(fromTime, "-", toTime)
+	// fmt.Println(filter)
 
 	result, err := as.AccidentRepository.Find(filter)
-
-	for _, res := range result {
-		fmt.Println(res.Time)
-	}
 
 	if err != nil {
 		return nil, err

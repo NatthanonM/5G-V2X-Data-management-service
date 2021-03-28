@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"5g-v2x-data-management-service/internal/config"
@@ -67,7 +68,10 @@ func (ar *AccidentRepository) Find(filter primitive.D) ([]*models.Accident, erro
 
 	var results []*models.Accident
 
-	cur, err := collection.Find(context.TODO(), filter)
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{"time", 1}})
+
+	cur, err := collection.Find(context.TODO(), filter, findOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
