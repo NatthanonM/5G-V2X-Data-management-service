@@ -379,12 +379,15 @@ func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp, nIn 
 		toTime = to.AsTime()
 	}
 
-	filter := bson.D{{
-		"time", bson.D{
+	filter := bson.D{
+		{"time", bson.D{
 			{"$gte", fromTime},
 			{"$lt", toTime},
-		},
-	}}
+		}},
+		{"road", bson.D{
+			{"$ne", "Unnamed Road"},
+		}},
+	}
 
 	matchStage := bson.D{{"$match", filter}}
 
