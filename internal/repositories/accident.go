@@ -115,21 +115,13 @@ func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year i
 
 }
 
-func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, year int) ([]int32, error) {
+func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(from, to time.Time) ([]int32, error) {
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
-	t := time.Now()
-	h := t.Hour() + 1
-	if t.Year() != year || int(t.Month()) != month || t.Day() != day {
-		h = 24
-	}
-	thTimeZone, _ := time.LoadLocation("Asia/Bangkok")
-	fromTime := time.Date(year, time.Month(month), day, 0, 0, 0, 0, thTimeZone).UTC()
-	toTime := time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), 59, 59, 999, thTimeZone).UTC()
 
 	filter := bson.D{{
 		"time", bson.D{
-			{"$gte", fromTime},
-			{"$lt", toTime},
+			{"$gte", from},
+			{"$lt", to},
 		},
 	}}
 	matchStage := bson.D{{"$match", filter}}
@@ -151,14 +143,14 @@ func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(day int, month int, yea
 	if err != nil {
 		log.Fatal(err)
 	}
-	countEachHour := make([]int32, h)
+	countEachHour := make([]int32, 24)
 	for cur.Next(context.TODO()) {
 		var elem models.NumberOfAccident
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
 		}
-		countEachHour[(int(elem.ID.Hour)+7)%24] = elem.Total
+		countEachHour[int(elem.ID.Hour)%24] = elem.Total
 	}
 	return countEachHour, nil
 }

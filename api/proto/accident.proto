@@ -48,6 +48,11 @@ message GetNumberOfAccidentToCalendarResponse {
   repeated AccidentStatCalData accidents = 1;
 }
 
+message GetNumberOfAccidentTimeBarRequest {
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to = 2;
+}
+
 message GetNumberOfAccidentTimeBarResponse { repeated int32 accidents = 1; }
 
 message GetNumberOfAccidentStreetResponse { AccidentStatPieData accidents = 1; }
@@ -81,7 +86,7 @@ service AccidentService {
       returns (GetAccidentDataResponse) {}
   rpc GetNumberOfAccidentToCalendar(GetNumberOfAccidentToCalendarRequest)
       returns (GetNumberOfAccidentToCalendarResponse) {}
-  rpc GetNumberOfAccidentTimeBar(google.protobuf.Empty)
+  rpc GetNumberOfAccidentTimeBar(GetNumberOfAccidentTimeBarRequest)
       returns (GetNumberOfAccidentTimeBarResponse) {}
   rpc GetNumberOfAccidentStreet(google.protobuf.Empty)
       returns (GetNumberOfAccidentStreetResponse) {}

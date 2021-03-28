@@ -110,8 +110,8 @@ func (as *AccidentService) GetNumberOfAccidentToCalendar(year int64) ([]*models.
 	return result, nil
 }
 
-func (as *AccidentService) GetNumberOfAccidentTimeBar(day int, month int, year int) ([]int32, error) {
-	result, err := as.AccidentRepository.GetNumberOfAccidentTimeBar(day, month, year)
+func (as *AccidentService) GetNumberOfAccidentTimeBar(from, to time.Time) ([]int32, error) {
+	result, err := as.AccidentRepository.GetNumberOfAccidentTimeBar(from, to)
 	if err != nil {
 		return nil, err
 	}

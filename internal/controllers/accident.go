@@ -160,10 +160,8 @@ func (ac *AccidentController) GetNumberOfAccidentToCalendar(ctx context.Context,
 }
 
 // GetNumberOfAccidentTimeBar
-func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfAccidentTimeBarResponse, error) {
-	// year, month, day := time.Now().Date()
-
-	numberOfAccidentTimeBar, err := ac.AccidentService.GetNumberOfAccidentTimeBar(1, 0, 1970)
+func (ac *AccidentController) GetNumberOfAccidentTimeBar(ctx context.Context, req *proto.GetNumberOfAccidentTimeBarRequest) (*proto.GetNumberOfAccidentTimeBarResponse, error) {
+	numberOfAccidentTimeBar, err := ac.AccidentService.GetNumberOfAccidentTimeBar(req.From.AsTime(), req.To.AsTime())
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
