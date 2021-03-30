@@ -96,9 +96,10 @@ func (dc *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Cont
 	}, nil
 }
 
-func (dc *DrowsinessController) GetNumberOfDrowsinessTimeBar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessTimeBarResponse, error) {
-	// year, month, day := time.Now().Date()
-	numberOfDrowsinessTimeBar, err := dc.DrowsinessService.GetNumberOfDrowsinessTimeBar(1, 0, 1970)
+func (dc *DrowsinessController) GetNumberOfDrowsinessTimeBar(ctx context.Context, req *proto.GetNumberOfDrowsinessTimeBarRequest) (*proto.GetNumberOfDrowsinessTimeBarResponse, error) {
+	fmt.Println("from: ", req.From.AsTime())
+	fmt.Println("to: ", req.To.AsTime())
+	numberOfDrowsinessTimeBar, err := dc.DrowsinessService.GetNumberOfDrowsinessTimeBar(req.From.AsTime(), req.To.AsTime())
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
