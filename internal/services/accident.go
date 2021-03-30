@@ -69,13 +69,13 @@ func (as *AccidentService) GetRecords(from, to *timestamppb.Timestamp, carID, us
 
 	if carID != nil {
 		filter = append(filter, bson.E{
-			"car_id", carID,
+			"car_id", *carID,
 		})
 	}
 
 	if username != nil {
 		filter = append(filter, bson.E{
-			"username", username,
+			"username", *username,
 		})
 	}
 
