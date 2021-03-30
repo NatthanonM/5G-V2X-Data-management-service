@@ -391,7 +391,7 @@ func (ar *AccidentRepository) FindTopNRoad(from, to *timestamppb.Timestamp, nIn 
 	}
 
 	sortStage := bson.D{
-		{"$sort", bson.D{{"count", -1}}},
+		{"$sort", bson.D{{"count", -1}, {"_id", 1}}},
 	}
 
 	cur, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage, sortStage})
