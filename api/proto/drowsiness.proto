@@ -3,7 +3,6 @@ package proto;
 option go_package = ".;proto";
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 message DrowsinessData {
   string username = 1;
@@ -31,6 +30,8 @@ message GetDrowsinessDataRequest {
 
 message GetDrowsinessDataResponse { repeated DrowsinessData drowsinesses = 1; }
 
+message GetNumberOfDrowsinessToCalendarRequest { optional int64 year = 1; }
+
 message GetNumberOfDrowsinessToCalendarResponse {
   repeated DrowsinessStatCalData drowsinesss = 1;
 }
@@ -57,7 +58,7 @@ service DrowsinessService {
       returns (CreateDrowsinessDataResponse) {}
   rpc GetDrowsinessData(GetDrowsinessDataRequest)
       returns (GetDrowsinessDataResponse) {}
-  rpc GetNumberOfDrowsinessToCalendar(google.protobuf.Empty)
+  rpc GetNumberOfDrowsinessToCalendar(GetNumberOfDrowsinessToCalendarRequest)
       returns (GetNumberOfDrowsinessToCalendarResponse) {}
   rpc GetNumberOfDrowsinessTimeBar(GetNumberOfDrowsinessTimeBarRequest)
       returns (GetNumberOfDrowsinessTimeBarResponse) {}

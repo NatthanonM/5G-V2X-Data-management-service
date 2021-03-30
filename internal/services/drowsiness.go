@@ -84,7 +84,7 @@ func (ds *DrowsinessService) GetDrowsiness(from, to *timestamppb.Timestamp, carI
 	return drowsinessData, nil
 }
 
-func (ds *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int) ([]*models.DrowsinessStatCal, error) {
+func (ds *DrowsinessService) GetNumberOfDrowsinessToCalendar(year int64) ([]*models.DrowsinessStatCal, error) {
 	result, err := ds.DrowsinessRepository.GetNumberOfDrowsinessToCalendar(year)
 
 	if err != nil {

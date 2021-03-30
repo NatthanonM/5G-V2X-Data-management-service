@@ -7,8 +7,6 @@ import (
 	"context"
 	"fmt"
 	"time"
-
-	"github.com/golang/protobuf/ptypes/empty"
 )
 
 type DrowsinessController struct {
@@ -71,8 +69,13 @@ func (dc *DrowsinessController) GetDrowsinessData(ctx context.Context, req *prot
 	}, nil
 }
 
-func (dc *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Context, req *empty.Empty) (*proto.GetNumberOfDrowsinessToCalendarResponse, error) {
-	year := time.Now().Year()
+func (dc *DrowsinessController) GetNumberOfDrowsinessToCalendar(ctx context.Context, req *proto.GetNumberOfDrowsinessToCalendarRequest) (*proto.GetNumberOfDrowsinessToCalendarResponse, error) {
+	var year int64
+	if req.Year == nil {
+		year = int64(time.Now().UTC().Year())
+	} else {
+		year = *req.Year
+	}
 	numberOfDrowsinessCurrentYear, err := dc.DrowsinessService.GetNumberOfDrowsinessToCalendar(year)
 	if err != nil {
 		fmt.Println(err)
