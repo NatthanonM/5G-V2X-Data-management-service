@@ -94,3 +94,21 @@ func (cr *CarRepository) FindAll() ([]*models.Car, error) {
 
 	return results, nil
 }
+
+func (cr *CarRepository) Update(updateCar *models.Car) error {
+	collection := cr.MONGO.Client.Database(cr.config.DatabaseName).Collection("car")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	bsonFilter := bson.M{"_id": updateCar.CarID}
+	bsonUpdate := bson.D{
+		{"$set", bson.D{{"car_detail", updateCar.CarDetail}, {"vehicle_registration_number", updateCar.VehicleRegistrationNumber}}},
+	}
+
+	_, err := collection.UpdateOne(ctx, bsonFilter, bsonUpdate)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

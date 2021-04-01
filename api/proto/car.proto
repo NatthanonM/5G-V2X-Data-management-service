@@ -25,8 +25,22 @@ message GetCarListResponse { repeated Car car_list = 1; }
 
 message GetCarRequest { string car_id = 1; }
 
+message UpdateCarRequest {
+  string car_id = 1;
+  string car_detail = 2;
+  string vehicle_registration_number = 3;
+}
+
+message UpdateCarResponse {}
+
+message DeleteCarRequest { string car_id = 1; }
+
+message DeleteCarResponse {}
+
 service CarService {
   rpc RegisterNewCar(RegisterNewCarRequest) returns (RegisterNewCarResponse) {}
   rpc GetCarList(google.protobuf.Empty) returns (GetCarListResponse) {}
   rpc GetCar(GetCarRequest) returns (Car) {}
+  rpc UpdateCar(UpdateCarRequest) returns (UpdateCarResponse) {}
+  rpc DeleteCar(DeleteCarRequest) returns (DeleteCarResponse) {}
 }

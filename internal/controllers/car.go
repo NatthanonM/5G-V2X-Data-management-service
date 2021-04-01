@@ -76,3 +76,27 @@ func (cc *CarController) GetCar(ctx context.Context, req *proto.GetCarRequest) (
 		MfgAt:                     utils.WrapperTime(&car.MfgAt),
 	}, nil
 }
+
+func (cc *CarController) UpdateCar(ctx context.Context, req *proto.UpdateCarRequest) (*proto.UpdateCarResponse, error) {
+	err := cc.CarService.UpdateCar(&models.Car{
+		CarID:                     req.CarId,
+		CarDetail:                 req.CarDetail,
+		VehicleRegistrationNumber: req.VehicleRegistrationNumber,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &proto.UpdateCarResponse{}, nil
+}
+
+func (cc *CarController) DeleteCar(ctx context.Context, req *proto.DeleteCarRequest) (*proto.DeleteCarResponse, error) {
+	// err := cc.CarService.UpdateCar(&models.Car{
+	// 	CarID:                     req.CarId,
+	// 	CarDetail:                 req.CarDetail,
+	// 	VehicleRegistrationNumber: req.VehicleRegistrationNumber,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return &proto.DeleteCarResponse{}, nil
+}
