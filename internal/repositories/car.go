@@ -85,7 +85,12 @@ func (cr *CarRepository) FindAll() ([]*models.Car, error) {
 
 	var results []*models.Car
 
-	filter := bson.D{{}}
+	filter := bson.M{
+		"deleted_at": bson.M{
+			"$eq": nil,
+		},
+	}
+
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
@@ -126,6 +131,28 @@ func (cr *CarRepository) Update(updateCar *models.Car) error {
 	bsonUpdate := bson.D{
 		{
 			"$set", updateInput,
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, bsonFilter, bsonUpdate)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cr *CarRepository) Delete(carId string) error {
+	collection := cr.MONGO.Client.Database(cr.config.DatabaseName).Collection("car")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	bsonFilter := bson.M{"_id": carId}
+	bsonUpdate := bson.D{
+		{
+			"$set", bson.D{
+				{"deleted_at", time.Now().UTC()},
+			},
 		},
 	}
 

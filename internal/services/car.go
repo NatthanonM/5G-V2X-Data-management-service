@@ -72,10 +72,10 @@ func (cs *CarService) DeleteCar(carId string) error {
 		return status.Error(codes.NotFound, "Car not found.")
 	}
 
-	// err = cs.CarRepository.Delete(carId)
-	// if err != nil {
-	// 	return status.Error(codes.Internal, "Delete car failed")
-	// }
+	err = cs.CarRepository.Delete(carId)
+	if err != nil {
+		return status.Error(codes.Internal, "Delete car failed")
+	}
 
 	return err
 }
