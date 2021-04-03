@@ -26,9 +26,6 @@ func NewCarController(CarService *services.CarService, Config *config.Config) *C
 }
 
 func (cc *CarController) RegisterNewCar(ctx context.Context, req *proto.RegisterNewCarRequest) (*proto.RegisterNewCarResponse, error) {
-	if _, err := cc.CarService.GetCarByVehicleRegistrationNumber(req.VehicleRegistrationNumber); err == nil {
-		return nil, status.Error(codes.AlreadyExists, "Vehicle registration number is already existed.")
-	}
 	car := models.Car{
 		CarDetail:                 &req.CarDetail,
 		VehicleRegistrationNumber: &req.VehicleRegistrationNumber,

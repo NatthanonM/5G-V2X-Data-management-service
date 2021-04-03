@@ -3,6 +3,7 @@ package services
 import (
 	"5g-v2x-data-management-service/internal/models"
 	"5g-v2x-data-management-service/internal/repositories"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,6 +28,10 @@ func (cs *CarService) GetCarByVehicleRegistrationNumber(vehRegNo string) (*model
 }
 
 func (cs *CarService) RegisterNewCar(car *models.Car) (*string, error) {
+	if _, err := cs.GetCarByVehicleRegistrationNumber(*car.VehicleRegistrationNumber); err == nil {
+		return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Vehicle registration number `%s` is already existed.", *car.VehicleRegistrationNumber))
+	}
+
 	carID, err := cs.CarRepository.Create(car)
 	if err != nil {
 		return nil, err
@@ -51,6 +56,12 @@ func (cs *CarService) GetCar(carID string) (*models.Car, error) {
 }
 
 func (cs *CarService) UpdateCar(updateCar *models.Car) error {
+	if updateCar.VehicleRegistrationNumber != nil {
+		if _, err := cs.GetCarByVehicleRegistrationNumber(*updateCar.VehicleRegistrationNumber); err == nil {
+			return status.Error(codes.AlreadyExists, fmt.Sprintf("Vehicle registration number `%s` is already existed.", *updateCar.VehicleRegistrationNumber))
+		}
+	}
+
 	_, err := cs.GetCar(updateCar.CarID)
 
 	if err != nil {
