@@ -19,9 +19,7 @@ func NewCarService(carRepository *repositories.CarRepository) *CarService {
 }
 
 func (cs *CarService) GetCarByVehicleRegistrationNumber(vehRegNo string) (*models.Car, error) {
-	filter := make(map[string]interface{})
-	filter["vehicle_registration_number"] = vehRegNo
-	car, err := cs.CarRepository.FindOne(filter)
+	car, err := cs.CarRepository.FindOne(nil, &vehRegNo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,10 +43,7 @@ func (cs *CarService) GetAllCar() ([]*models.Car, error) {
 }
 
 func (cs *CarService) GetCar(carID string) (*models.Car, error) {
-	filter := make(map[string]interface{})
-
-	filter["_id"] = carID
-	car, err := cs.CarRepository.FindOne(filter)
+	car, err := cs.CarRepository.FindOne(&carID, nil)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "Car not found.")
 	}
@@ -66,6 +61,21 @@ func (cs *CarService) UpdateCar(updateCar *models.Car) error {
 	if err != nil {
 		return status.Error(codes.Internal, "Update car failed")
 	}
+
+	return err
+}
+
+func (cs *CarService) DeleteCar(carId string) error {
+	_, err := cs.GetCar(carId)
+
+	if err != nil {
+		return status.Error(codes.NotFound, "Car not found.")
+	}
+
+	// err = cs.CarRepository.Delete(carId)
+	// if err != nil {
+	// 	return status.Error(codes.Internal, "Delete car failed")
+	// }
 
 	return err
 }

@@ -30,8 +30,8 @@ func (cc *CarController) RegisterNewCar(ctx context.Context, req *proto.Register
 		return nil, status.Error(codes.AlreadyExists, "Vehicle registration number is already existed.")
 	}
 	car := models.Car{
-		CarDetail:                 req.CarDetail,
-		VehicleRegistrationNumber: req.VehicleRegistrationNumber,
+		CarDetail:                 &req.CarDetail,
+		VehicleRegistrationNumber: &req.VehicleRegistrationNumber,
 		MfgAt:                     req.MfgAt.AsTime(),
 	}
 	carID, err := cc.CarService.RegisterNewCar(&car)
@@ -52,8 +52,8 @@ func (cc *CarController) GetCarList(ctx context.Context, req *empty.Empty) (*pro
 	for _, car := range carList {
 		grpcCarList = append(grpcCarList, &proto.Car{
 			CarId:                     car.CarID,
-			VehicleRegistrationNumber: car.VehicleRegistrationNumber,
-			CarDetail:                 car.CarDetail,
+			VehicleRegistrationNumber: *car.VehicleRegistrationNumber,
+			CarDetail:                 *car.CarDetail,
 			RegisteredAt:              utils.WrapperTime(&car.RegisteredAt),
 			MfgAt:                     utils.WrapperTime(&car.MfgAt),
 		})
@@ -70,19 +70,23 @@ func (cc *CarController) GetCar(ctx context.Context, req *proto.GetCarRequest) (
 	}
 	return &proto.Car{
 		CarId:                     car.CarID,
-		VehicleRegistrationNumber: car.VehicleRegistrationNumber,
-		CarDetail:                 car.CarDetail,
+		VehicleRegistrationNumber: *car.VehicleRegistrationNumber,
+		CarDetail:                 *car.CarDetail,
 		RegisteredAt:              utils.WrapperTime(&car.RegisteredAt),
 		MfgAt:                     utils.WrapperTime(&car.MfgAt),
 	}, nil
 }
 
 func (cc *CarController) UpdateCar(ctx context.Context, req *proto.UpdateCarRequest) (*proto.UpdateCarResponse, error) {
-	err := cc.CarService.UpdateCar(&models.Car{
+	if req.CarDetail == nil && req.VehicleRegistrationNumber == nil {
+		return nil, status.Error(codes.InvalidArgument, "Car detail or vehicle registration number is not provided")
+	}
+	updatedCar := &models.Car{
 		CarID:                     req.CarId,
 		CarDetail:                 req.CarDetail,
 		VehicleRegistrationNumber: req.VehicleRegistrationNumber,
-	})
+	}
+	err := cc.CarService.UpdateCar(updatedCar)
 	if err != nil {
 		return nil, err
 	}
@@ -90,13 +94,9 @@ func (cc *CarController) UpdateCar(ctx context.Context, req *proto.UpdateCarRequ
 }
 
 func (cc *CarController) DeleteCar(ctx context.Context, req *proto.DeleteCarRequest) (*proto.DeleteCarResponse, error) {
-	// err := cc.CarService.UpdateCar(&models.Car{
-	// 	CarID:                     req.CarId,
-	// 	CarDetail:                 req.CarDetail,
-	// 	VehicleRegistrationNumber: req.VehicleRegistrationNumber,
-	// })
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := cc.CarService.DeleteCar(req.CarId)
+	if err != nil {
+		return nil, err
+	}
 	return &proto.DeleteCarResponse{}, nil
 }

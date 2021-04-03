@@ -27,8 +27,8 @@ message GetCarRequest { string car_id = 1; }
 
 message UpdateCarRequest {
   string car_id = 1;
-  string car_detail = 2;
-  string vehicle_registration_number = 3;
+  optional string car_detail = 2;
+  optional string vehicle_registration_number = 3;
 }
 
 message UpdateCarResponse {}

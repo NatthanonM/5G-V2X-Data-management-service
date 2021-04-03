@@ -5,7 +5,6 @@ import (
 	"5g-v2x-data-management-service/internal/infrastructures/database"
 	"5g-v2x-data-management-service/internal/models"
 	"context"
-	"encoding/json"
 	"log"
 	"time"
 
@@ -41,25 +40,40 @@ func (cr *CarRepository) Create(car *models.Car) (*string, error) {
 	return &id, nil
 }
 
-func (cr *CarRepository) FindOne(filter map[string]interface{}) (*models.Car, error) {
+func (cr *CarRepository) FindOne(carID, vehRegNo *string) (*models.Car, error) {
 	collection := cr.MONGO.Client.Database(cr.config.DatabaseName).Collection("car")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var result *models.Car
 
-	jsonString, err := json.Marshal(filter)
-	if err != nil {
-		panic(err)
+	filterDeleted := bson.M{
+		"deleted_at": bson.M{
+			"$eq": nil,
+		},
 	}
 
-	var bsonFilter interface{}
-	err = bson.UnmarshalExtJSON([]byte(jsonString), true, &bsonFilter)
-	if err != nil {
-		panic(err)
+	inputFilter := bson.M{}
+
+	if carID != nil {
+		inputFilter = bson.M{
+			"_id": *carID,
+		}
+	}
+	if vehRegNo != nil {
+		inputFilter = bson.M{
+			"vehicle_registration_number": *vehRegNo,
+		}
 	}
 
-	err = collection.FindOne(ctx, bsonFilter).Decode(&result)
+	filter := bson.M{
+		"$and": []bson.M{
+			filterDeleted,
+			inputFilter,
+		},
+	}
+
+	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +115,18 @@ func (cr *CarRepository) Update(updateCar *models.Car) error {
 	defer cancel()
 
 	bsonFilter := bson.M{"_id": updateCar.CarID}
+	updateInput := bson.D{}
+	if updateCar.CarDetail != nil {
+		updateInput = append(updateInput, bson.E{"car_detail", *updateCar.CarDetail})
+	}
+	if updateCar.VehicleRegistrationNumber != nil {
+		updateInput = append(updateInput, bson.E{"vehicle_registration_number", *updateCar.VehicleRegistrationNumber})
+	}
+
 	bsonUpdate := bson.D{
-		{"$set", bson.D{{"car_detail", updateCar.CarDetail}, {"vehicle_registration_number", updateCar.VehicleRegistrationNumber}}},
+		{
+			"$set", updateInput,
+		},
 	}
 
 	_, err := collection.UpdateOne(ctx, bsonFilter, bsonUpdate)
