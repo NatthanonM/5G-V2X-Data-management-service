@@ -57,7 +57,7 @@ func (cs *CarService) GetCar(carID string) (*models.Car, error) {
 
 func (cs *CarService) UpdateCar(updateCar *models.Car) error {
 	if updateCar.VehicleRegistrationNumber != nil {
-		if _, err := cs.GetCarByVehicleRegistrationNumber(*updateCar.VehicleRegistrationNumber); err == nil {
+		if car, err := cs.GetCarByVehicleRegistrationNumber(*updateCar.VehicleRegistrationNumber); err == nil && car.CarID != updateCar.CarID {
 			return status.Error(codes.AlreadyExists, fmt.Sprintf("Vehicle registration number `%s` is already existed.", *updateCar.VehicleRegistrationNumber))
 		}
 	}
