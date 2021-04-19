@@ -7,6 +7,9 @@ RUN go get github.com/golang/protobuf/protoc-gen-go
 ENV GO11MODULE=on
 
 ENV SERVICE_ADDRESS=0.0.0.0:8082
+ENV DATABASE_URI=
+ENV DATABASE_NAME=
+ENV GOOGLE_API_KEY=
 
 WORKDIR /app
 COPY Makefile /app/Makefile
@@ -17,7 +20,6 @@ ADD go.mod /app/go.mod
 ADD go.sum /app/go.sum
 ADD api /app/api
 ADD internal /app/internal
-ADD env /app/env
 
 RUN go mod tidy
 RUN go mod vendor

@@ -7,9 +7,9 @@ import (
 // Config ...
 type Config struct {
 	ServiceAddress string `env:"SERVICE_ADDRESS" envDefault:"0.0.0.0:8082"`
-	DatabaseURI    string `env:"DATABASE_URI,file" envDefault:"./env/database_uri"`
-	DatabaseName   string `env:"DATABASE_NAME,file" envDefault:"./env/database_name"`
-	GoogleAPIKey   string `env:"GOOGLE_API_KEY,file" envDefault:"./env/google_map_api_key"`
+	DatabaseURI    string `env:"DATABASE_URI" envDefault:""`
+	DatabaseName   string `env:"DATABASE_NAME" envDefault:""`
+	GoogleAPIKey   string `env:"GOOGLE_API_KEY" envDefault:""`
 }
 
 // NewConfig ...
