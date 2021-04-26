@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  data-management-service:
+    build: .
+    ports:
+      - "80:8082"
+    environment:
+      SERVICE_ADDRESS:
+      DATABASE_URI:
+      DATABASE_NAME:
+      GOOGLE_API_KEY:
