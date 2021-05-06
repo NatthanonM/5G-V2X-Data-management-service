@@ -187,7 +187,8 @@ func (ar *DrowsinessRepository) GetNumberOfDrowsinessTimeBar(from, to time.Time)
 		if err != nil {
 			log.Fatal(err)
 		}
-		countEachHour[int(elem.ID.Hour)%24] = elem.Total
+		// +7 Bangkok time zone
+		countEachHour[(int(elem.ID.Hour)+7)%24] = elem.Total
 	}
 
 	return countEachHour, nil
