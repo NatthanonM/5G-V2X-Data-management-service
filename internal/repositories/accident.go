@@ -116,8 +116,6 @@ func (ar *AccidentRepository) GetNumberOfAccidentHour(day int, month int, year i
 }
 
 func (ar *AccidentRepository) GetNumberOfAccidentTimeBar(from, to time.Time) ([]int32, error) {
-	fmt.Println(from)
-	fmt.Println(to)
 	collection := ar.MONGO.Client.Database(ar.config.DatabaseName).Collection("accident")
 
 	filter := bson.D{{
